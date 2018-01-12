@@ -46,12 +46,15 @@ int main(int argc, char** argv)
     
     Camera camera = {{ 3.0f, 3.75f, 3.0f }, { 0.0f, 1.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, 90.0f };
     
-    Shader shader = LoadShader("assets/base.glsl", "assets/pixelate.glsl");
+    Shader shader = LoadShader("assets/base.glsl", "assets/lighting.glsl");
+    shader.locs[LOC_MATRIX_MODEL] = GetShaderLocation(shader, "modelMatrix");
     
     Model model = LoadModel("assets/game/Monitor_01.obj");
     model.material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/game/Monitor_01.png");
+    model.material.shader = shader;
     Model model2 = LoadModel("assets/game/Desk.obj");
     model2.material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/game/Desk.png");
+    model2.material.shader = shader;
     
     Mesh screenmesh = GenMeshPlane(GL_WIDTH, GL_HEIGHT, 256, 256);
     Model screen = LoadModelFromMesh(screenmesh);
@@ -146,7 +149,6 @@ int main(int argc, char** argv)
         screen.material.maps[MAP_DIFFUSE].texture = screentarget.texture;
         
         Begin3dMode(camera);
-        
         // DrawModel(model, (Vector3){0.3, 2.6, 0}, 1.0, GRAY);
         DrawModel(model, monitor_pos, 1.0, GRAY);
         DrawModel(model2, (Vector3){0, 0, 0}, 1.f, GRAY);
@@ -157,6 +159,8 @@ int main(int argc, char** argv)
         DrawModel(screen, (Vector3){monitor_pos.x, monitor_pos.y+0.9, monitor_pos.z-0.05}, 1.f, WHITE);
         
         End3dMode();
+        
+        // DrawTextureRec(target.texture, (Rectangle){0, 0, 640, -480}, (Vector2){0, 0}, WHITE);
         
         EndDrawing();
         
