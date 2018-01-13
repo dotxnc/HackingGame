@@ -13,7 +13,7 @@ typedef struct Screen_t {
 const double screen_w_gl = 1.0485;
 const double screen_h_gl = 1.049;
 
-void loadScreenModels();
+void loadScreenModels(Shader);
 void freeScreenModels();
 Screen_t loadScreen(int, int);
 void drawScreen(Screen_t*);

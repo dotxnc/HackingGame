@@ -6,7 +6,7 @@ in vec3 fragNormal;
 
 uniform sampler2D texture0;
 
-uniform vec3 lightDirection = {1.f, -0.3f, -0.3f};
+uniform vec3 lightDirection = {1.f, -0.3f, -0.5f};
 uniform vec4 diffuseLightColor = {1.f, 1.f, 1.f, 1.f};
 uniform vec4 ambientLight = {0.15f, 0.15f, 0.15f, 1.f};
 
