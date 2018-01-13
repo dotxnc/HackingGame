@@ -1,10 +1,27 @@
 
-#include <raylib.h>
-#include <raymath.h>
+#define CloseWindow CloseWindow_orig
+#define Rectangle Rectangle_orig
+#define ShowCursor ShowCursor_orig
+#define LoadImage LoadImage_orig
+#define DrawText DrawText_orig
+#define DrawTextEx DrawTextEx_orig
+#define PlaySound PlaySound_orig
+#include "dyad/dyad.h"
+#undef CloseWindow
+#undef Rectangle
+#undef ShowCursor
+#undef LoadImage
+#undef DrawText
+#undef DrawTextEx
+#undef PlaySound
+
 #include <stdio.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <raylib.h>
+#include <raymath.h>
 
 #include "screen.h"
 #include "os.h"
@@ -24,7 +41,6 @@ int main(int argc, char** argv)
     InitWindow(640, 480, "Hack");
     SetExitKey(KEY_F12);
     SetTargetFPS(60);
-    
     
     char flash[MAX_LINES][MAX_INPUT];
     for (int i = 0; i < MAX_LINES/2; i++) {

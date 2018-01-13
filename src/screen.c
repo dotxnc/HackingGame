@@ -8,12 +8,12 @@ static Mesh screen_mesh;
 
 void loadScreenModels(Shader lighting)
 {
-    screen_desk = LoadModel("assets/game/Desk.obj");
+    screen_desk = LoadModel("assets/game/Desk_02.obj");
     screen_monitor = LoadModel("assets/game/Monitor_01.obj");
     screen_mesh = GenMeshPlane(screen_w_gl, screen_h_gl, 256, 256);
     screen_viewer = LoadModelFromMesh(screen_mesh);
     
-    screen_desk.material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/game/Desk.png");
+    screen_desk.material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/game/Desk_02.png");
     screen_monitor.material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/game/Monitor_01.png");
     
     screen_desk.material.shader = lighting;

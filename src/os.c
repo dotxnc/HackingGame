@@ -8,6 +8,19 @@ void freeOS(OS_t* os)
 {
 }
 
+bool commandOS(OS_t* os, char* command)
+{
+    if (!strcmp(command, "server")) {
+        // TODO: start server
+        return true;
+    }
+    if (!strcmp(command, "client")) {
+        // TODO: start client
+        return true;
+    }
+    return false;
+}
+
 void updateOS(OS_t* os)
 {
     os->ostime += GetFrameTime();
@@ -59,17 +72,15 @@ void updateOS(OS_t* os)
             os->input[k] = 0;
             os->input_length = 0;
         }
+    } else if (k > -1) {
+        printf("%d\n", k);
     }
 }
 
 void flashOS(OS_t* os, char lines[MAX_LINES][MAX_INPUT], int num_lines)
 {
     os->line_length = 0;
-    // for (int i = 0; i < MAX_LINES; i++) {
-    //     strcpy(os->lines[i], "                                              ");
-    // }
     for (int i = 0; i < num_lines; i++) {
-        // strcpy(os->lines[i], lines[i]);
         pushlineOS(os, lines[i]);
         os->line_length++;
     }

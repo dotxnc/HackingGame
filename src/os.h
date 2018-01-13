@@ -26,6 +26,7 @@ typedef struct OS_t {
 
 void initOS(OS_t*);
 void freeOS(OS_t*);
+bool commandOS(OS_t*, char*);
 void updateOS(OS_t*);
 void flashOS(OS_t*, char[MAX_LINES][MAX_INPUT], int);
 void pushlineOS(OS_t*, char[MAX_INPUT]);
