@@ -9,7 +9,7 @@
 #define DrawText DrawText_orig
 #define DrawTextEx DrawTextEx_orig
 #define PlaySound PlaySound_orig
-#include <SDL2/SDL_net.h>
+// #include <SDL2/SDL_net.h>
 #undef CloseWindow
 #undef Rectangle
 #undef ShowCursor
@@ -24,13 +24,13 @@
 #include <string.h>
 
 typedef struct Network_t {
-    UDPsocket server_socket;
-    UDPpacket server_packet;
-    IPaddress socket_address;
+    // UDPsocket server_socket;
+    // UDPpacket server_packet;
+    // IPaddress socket_address;
     
-    IPaddress server_address;
-    UDPsocket client_socket;
-    UDPpacket client_packet;
+    // IPaddress server_address;
+    // UDPsocket client_socket;
+    // UDPpacket client_packet;
 } Network_t;
 
 static Network_t* network;

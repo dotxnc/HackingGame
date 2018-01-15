@@ -6,6 +6,10 @@ void initOS(OS_t* os)
     memset(local_os->input,'\0',MAX_INPUT);
     local_os->input_length = 0;
     flashOS(local_os, NULL, 0);
+    local_os->line_length = 0;
+    local_os->grabbed = false;
+    local_os->isskip = false;
+    local_os->ostime = 0.f;
 }
 
 void freeOS(OS_t* os)
@@ -39,13 +43,13 @@ bool commandOS(OS_t* os, char* command)
         return true;
     }
     else if (!strcmp(command, "clear")) {
-        flashOS(local_os, NULL, NULL);
+        flashOS(local_os, NULL, 0);
     }
     else if (!strcmp(command, "fuck")) {
         pushlineOS(local_os, "I just did sex so hard to this girl. She was moaning and stuff and i did sex so hard and so good with her. She was all \"Please have good sex with me\" and I said back \"Yeah, I'm going to really sex you so great lady\" and she's like \"Thanks\". It was so good and so hot and we both loved making a sex on all the positions. At the end I was all \"Hey, I'm going to finish sex now\" and she said \"Yes, that would be nice if you finished so hard on that towel\". I said \"Yes\" and I finished so hard on the towel. And It was so hot.");
     }
     else {
-        pushlineOS(local_os, "this string is way too long to fit in the max input size of the command line");
+        pushlineOS(local_os, "this string is way too long to fit in the max input size of the command line because im a terrible programmer and don't know what the fuck im doing");
     }
     return false;
 }
@@ -95,11 +99,6 @@ void updateOS(OS_t* os)
             os->input[os->input_length] = ' ';
             os->input_length++;
         }
-    } else if (k == KEY_ESCAPE) {
-        for (int k = 0; k < 52; k++) {
-            os->input[k] = 0;
-            os->input_length = 0;
-        }
     } else if (k == KEY_ENTER) {
         commandOS(os, os->input);
         memset(os->input,0,strlen(os->input));
@@ -126,17 +125,19 @@ void flashOS(OS_t* os, char lines[MAX_LINES][MAX_INPUT], int num_lines)
     
 }
 
-void pushlineOS(OS_t* os, char* line)
+void pushlineOS(OS_t* os, const char* line)
 {
     if (strlen(line) > MAX_INPUT) {
-        char newline[MAX_INPUT+1];
-        char rest[strlen(line)-MAX_INPUT+1];
-        memcpy(newline, &line[0], MAX_INPUT-1);
-        newline[MAX_INPUT] = '\0';
-        pushlineOS(os, newline);
-        memcpy(rest, &line[MAX_INPUT], strlen(line));
-        rest[strlen(line)-MAX_INPUT] = '\0';
-        pushlineOS(os, rest);
+        int n = 0;
+        while (n < strlen(line)) {
+            char str[MAX_INPUT+1];
+            for (int i = 0; i < MAX_INPUT; i++) {
+                str[i] = line[n+i];
+            }
+            str[MAX_INPUT] = '\0';
+            pushlineOS(os, str);
+            n+=MAX_INPUT;
+        }
         return;
     }
     if (os->line_length == MAX_LINES) {
@@ -147,13 +148,14 @@ void pushlineOS(OS_t* os, char* line)
         os->line_length++;
     }
     strcpy(os->lines[os->line_length-1], line);
+    printf("%d:%s\n", MAX_INPUT, line);
 }
 
 void drawOS(OS_t* os, Screen_t* scr)
 {
     DrawRectangle(0, 0, scr->texture.texture.width*screen_w_gl, scr->texture.texture.height*screen_h_gl, BLACK);
-    for (int i = 0; i < 40; i++) {
-        DrawText(os->lines[i], 5, 5+i*22, 20, GREEN);
+    for (int i = 0; i < MAX_LINES; i++) {
+        DrawText(FormatText("%s", os->lines[i]), 5, 5+i*22, 20, GREEN);
     }
     int iw = MeasureText(FormatText(">%s", os->input), 20);
     DrawText(FormatText(">%s", os->input), 5, 5+os->line_length*22, 20, GREEN);

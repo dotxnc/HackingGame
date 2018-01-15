@@ -10,7 +10,7 @@
 #include "screen.h"
 #include "network.h"
 
-#define MAX_INPUT 46
+#define MAX_INPUT 45
 #define MAX_LINES 23
 
 const char* const clist = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()-=_+:;\"'<>?,./";
@@ -32,7 +32,7 @@ void freeOS(OS_t*);
 bool commandOS(OS_t*, char*);
 void updateOS(OS_t*);
 void flashOS(OS_t*, char[MAX_LINES][MAX_INPUT], int);
-void pushlineOS(OS_t*, char*);
+void pushlineOS(OS_t*, const char*);
 void drawOS(OS_t*, Screen_t*);
 
 #endif
