@@ -153,7 +153,6 @@ void pushlineOS(OS_t* os, const char* line)
         os->line_length++;
     }
     strcpy(os->lines[os->line_length-1], line);
-    printf("%d:%s\n", MAX_INPUT, line);
 }
 
 void drawOS(OS_t* os, Screen_t* scr)

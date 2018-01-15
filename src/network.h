@@ -9,7 +9,7 @@
 #define DrawText DrawText_orig
 #define DrawTextEx DrawTextEx_orig
 #define PlaySound PlaySound_orig
-// #include <SDL2/SDL_net.h>
+#include <winsock2.h>
 #undef CloseWindow
 #undef Rectangle
 #undef ShowCursor
@@ -23,14 +23,29 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "os.h"
+
+typedef struct ServerData_t {
+    SOCKET socket;
+    struct sockaddr_in addr, si_other;
+    int slen, recv_len;
+    char buffer[512];
+    WSADATA wsa;
+} ServerData_t;
+
+typedef struct ClientData_t {
+    SOCKET socket;
+    struct sockaddr_in si_other;
+    int slen, recv_len;
+    char buffer[512];
+    WSADATA wsa;
+} ClientData_t;
+
 typedef struct Network_t {
-    // UDPsocket server_socket;
-    // UDPpacket server_packet;
-    // IPaddress socket_address;
-    
-    // IPaddress server_address;
-    // UDPsocket client_socket;
-    // UDPpacket client_packet;
+    bool server_running;
+    bool client_running;
+    ServerData_t server;
+    ClientData_t client;
 } Network_t;
 
 static Network_t* network;

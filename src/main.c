@@ -54,7 +54,7 @@ int main(int argc, char** argv)
     while (!WindowShouldClose())
     {
         updateClientNetwork();
-        // updateServerNetwork();
+        updateServerNetwork();
         
         updateOS(local_os);
         if (!local_os->grabbed) {
@@ -63,7 +63,7 @@ int main(int argc, char** argv)
         
         BeginDrawing();
         
-        ClearBackground(BLACK);
+        ClearBackground((Color){0, 0, 0, 10});
         updatePlayerScreen(&scr);
         
         Begin3dMode(camera);

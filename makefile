@@ -1,7 +1,7 @@
 rwildcard = $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst *,%,$2),$d))
 SRC = $(call rwildcard, src/, *.c) #$(wildcard src/*.cpp) $(wildcard src/engine/*.cpp)
 OBJ = $(patsubst src/%.c, obj/%.o, $(SRC))
-CFLAGS = --std=c11 -Wl,-allow-multiple-definition -Isrc/
+CFLAGS = --std=c11 -Wl,-allow-multiple-definition -Wno-incompatible-pointer-types -Wno-int-conversion -Isrc/
 OUT = hacking
 
 LDFLAGS = -lraylib -lOpenAL32 -lglfw3 -lopengl32 -lenet64 -lgdi32 -lws2_32
