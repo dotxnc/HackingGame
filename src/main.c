@@ -71,6 +71,8 @@ int main(int argc, char** argv)
         drawScreen(&scr);
         End3dMode();
         
+        DrawText(FormatText("%s", local_os->grabbed ? "GRABBED" : "NOT GRABBED"), 10, 10, 20, WHITE);
+        
         EndDrawing();
         
     }
