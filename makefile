@@ -4,7 +4,8 @@ OBJ = $(patsubst src/%.c, obj/%.o, $(SRC))
 CFLAGS = --std=c11 -Wl,-allow-multiple-definition -Isrc/
 OUT = hacking
 
-LDFLAGS = -lraylib_new -lOpenAL32 -lglfw3 -lgdi32 -lopengl32 -lws2_32
+LDFLAGS = -lraylib -lOpenAL32 -lglfw3 -lopengl32 -lenet64 -lgdi32 -lSDL2_net -lws2_32
+# LDFLAGS = -lmingw32 -lraylib -lSDL2_net -mwindows -Wl,--no-undefined -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lversion -luuid -static-libgcc
 LIBS = 
 CC = gcc
 

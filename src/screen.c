@@ -22,10 +22,10 @@ void loadScreenModels(Shader lighting)
 
 void freeScreenModels()
 {
-    UnloadMesh(&screen_mesh);
     UnloadModel(screen_desk);
     UnloadModel(screen_viewer);
     UnloadModel(screen_monitor);
+    // UnloadMesh(&screen_mesh);
 }
 
 void drawScreen(Screen_t* screen)

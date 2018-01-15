@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include "screen.h"
+#include "network.h"
 
 #define MAX_INPUT 46
 #define MAX_LINES 23
@@ -24,12 +25,14 @@ typedef struct OS_t {
     float ostime;
 } OS_t;
 
+OS_t* local_os;
+
 void initOS(OS_t*);
 void freeOS(OS_t*);
 bool commandOS(OS_t*, char*);
 void updateOS(OS_t*);
 void flashOS(OS_t*, char[MAX_LINES][MAX_INPUT], int);
-void pushlineOS(OS_t*, char[MAX_INPUT]);
+void pushlineOS(OS_t*, char*);
 void drawOS(OS_t*, Screen_t*);
 
 #endif
