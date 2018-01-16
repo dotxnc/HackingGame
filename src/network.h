@@ -26,6 +26,7 @@
 #include "os.h"
 #include "clientpackets.h"
 #include "serverpackets.h"
+#include "screen.h"
 
 #define MAX_CLIENTS 8
 
@@ -35,7 +36,8 @@ typedef enum PACKET_TYPE {
     PACKET_DISCONNECT,
     PACKET_POSITON,
     PACKET_CHAT,
-    PACKET_UID
+    PACKET_UID,
+    PACKET_NEWPLAYER
 } PACKET_TYPE;
 
 // shared packets
@@ -51,7 +53,16 @@ typedef struct ClientInfo_t {
     int uid;
     int slen;
     struct sockaddr_in si_other;
+    float x;
+    float z;
 } ClientInfo_t;
+
+typedef struct PlayerInfo_t {
+    int uid;
+    float x;
+    float z;
+    Screen_t screen;
+} PlayerInfo_t;
 
 typedef struct ServerData_t {
     SOCKET socket;
@@ -70,6 +81,8 @@ typedef struct ClientData_t {
     char buffer[512];
     WSADATA wsa;
     int uid;
+    PlayerInfo_t players[MAX_CLIENTS];
+    int num_players;
 } ClientData_t;
 
 typedef struct Network_t {
@@ -92,5 +105,8 @@ void updateClientNetwork();
 
 bool sendDataClient(void*, int, int);
 bool sendDataServer(void*, int, int, int);
+
+void drawPlayers();
+void drawPlayerList();
 
 #endif

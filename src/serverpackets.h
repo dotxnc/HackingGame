@@ -7,6 +7,8 @@ typedef struct UIDPacket_t {
 
 typedef struct NewPlayerPacket_t {
     int uid;
+    float x;
+    float z;
 } NewPlayerPacket_t;
 
 #endif

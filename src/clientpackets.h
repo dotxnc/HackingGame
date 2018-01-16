@@ -6,7 +6,8 @@ typedef struct ClientInfoPacket_t {
 } ClientInfoPacket_t;
 
 typedef struct ClientConnectPacket_t {
-    int buffer;
+    float x;
+    float z;
 } ClientConnectPacket_t;
 
 #endif

@@ -11,12 +11,7 @@
 #include "screen.h"
 #include "os.h"
 
-int WIDTH  = 512.0;//
-int HEIGHT = 512.0;//
-
 Vector3 monitor_pos = (Vector3){0.3, 2.6, 1.25};
-
-Screen_t scr;
 
 void updatePlayerScreen(Screen_t*);
 
@@ -30,26 +25,24 @@ int main(int argc, char** argv)
     
     initOS(NULL);
     
-    // char flash[MAX_LINES][MAX_INPUT];
-    // for (int i = 0; i < MAX_LINES/2; i++) {
-    //     strcpy(flash[i], FormatText("This is line %d", i+1));
-    // }
-    // flashOS(local_os, flash, MAX_LINES/2);
-    
-    WIDTH *= screen_w_gl;
-    HEIGHT *= screen_h_gl;
-    
-    Camera camera = {{ 3.0f, 3.65f, 3.0f }, { 0.0f, 1.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, 90.0f };
     Shader shader = LoadShader("assets/base.glsl", "assets/lighting.glsl");
-    
     loadScreenModels(shader);
-    scr.texture = LoadRenderTexture(WIDTH, HEIGHT);
+    
+    local_screen.pos.x = -20+rand()%40;
+    local_screen.pos.z = -20+rand()%40;
+    
+    int WIDTH = screen_w * screen_w_gl;
+    int HEIGHT = screen_h * screen_h_gl;
+    
+    Camera camera = {{ local_screen.pos.x+3.0f, 3.65f, local_screen.pos.z+3.0f }, { 0.0f, 1.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, 90.0f };
     
     Model tower = LoadModel("assets/game/Tower.obj");
     tower.material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/game/Tower.png");
     tower.material.shader = shader;
     
     SetCameraMode(camera, CAMERA_FIRST_PERSON);
+    
+    printf("[INFO] Initialized player at %fx %fz\n", local_screen.pos.x, local_screen.pos.z);
     
     while (!WindowShouldClose())
     {
@@ -62,25 +55,27 @@ int main(int argc, char** argv)
         }
         
         BeginDrawing();
-        
-        ClearBackground((Color){0, 0, 0, 10});
-        updatePlayerScreen(&scr);
-        
-        Begin3dMode(camera);
-        DrawModel(tower, (Vector3){0, 0, -20}, 1.f, WHITE);
-        drawScreen(&scr);
-        End3dMode();
-        
-        DrawText(FormatText("%s", local_os->grabbed ? "GRABBED" : "NOT GRABBED"), 10, 10, 20, WHITE);
+            
+            ClearBackground((Color){0, 0, 0, 10});
+            updatePlayerScreen(&local_screen);
+            
+            Begin3dMode(camera);
+                drawPlayers();
+                DrawModel(tower, (Vector3){0, 0, -20}, 1.f, WHITE);
+                // drawScreen(&local_screen);
+            End3dMode();
+            
+            DrawText(FormatText("%s", local_os->grabbed ? "GRABBED" : "NOT GRABBED"), 10, 10, 20, WHITE);
+            drawPlayerList();
         
         EndDrawing();
         
     }
     
     freeNetwork();
+    freeOS(NULL);
     freeScreenModels();
     UnloadModel(tower);
-    freeOS(NULL);
     
     CloseWindow();
     

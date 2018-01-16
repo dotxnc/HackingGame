@@ -29,6 +29,11 @@ void loadScreenModels(Shader lighting)
     screen_monitor.material.shader = lighting;
     screen_keyboard.material.shader = lighting;
     screen_mouse.material.shader = lighting;
+    
+    // local_screen = (Screen_t*)malloc(sizeof(local_screen));
+    local_screen.pos = (Vector3){0,0,0};
+    local_screen.in_use = false;
+    local_screen.texture = LoadRenderTexture(screen_w*screen_w_gl, screen_h*screen_h_gl);
 }
 
 void freeScreenModels()
@@ -38,11 +43,13 @@ void freeScreenModels()
     UnloadModel(screen_monitor);
     UnloadModel(screen_keyboard);
     UnloadModel(screen_mouse);
+    UnloadRenderTexture(local_screen.texture);
     // UnloadMesh(&screen_mesh);
 }
 
 void drawScreen(Screen_t* screen)
 {
+    // printf("Drawing: %f %f\n", screen->pos.x, screen->pos.z);
     SetTextureFilter(screen->texture.texture, FILTER_POINT);
     
     DrawModel(screen_desk, screen->pos, 1.f, GRAY);
