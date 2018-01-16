@@ -5,8 +5,6 @@ bool initNetwork()
     network = (Network_t*)malloc(sizeof(Network_t));
     network->server_running = false;
     network->client_running = false;
-    // network->slen = sizeof(network->si_other);
-    // network->server_socket = NULL;
     
     return false;
 }
@@ -77,18 +75,21 @@ bool startClientNetwork(const char* ip, int port)
     network->client.si_other.sin_addr.S_un.S_addr = inet_addr(ip);
     
     int nmode = 1;
-    if (ioctlsocket(network->server.socket, FIONBIO, &nmode) == SOCKET_ERROR) {
+    if (ioctlsocket(network->client.socket, FIONBIO, &nmode) == SOCKET_ERROR) {
         printf("[NET][CLIENT] Failed to set nonblocking mode\n");
         return true;
     }
     printf("[NET][CLIENT] Enabled nonblocking mode\n");
     
-    if (sendto(network->client.socket, "SHIT", 4, 0, &network->client.si_other, network->client.slen) == SOCKET_ERROR) {
-        printf("[NET][CLIENT] Failed to send test packet\n");
-    }
-    printf("[NET][CLIENT] Sent test packet\n");
-    
     network->client_running = true;
+    
+    TestPacket_t* test_packet = (TestPacket_t*)malloc(sizeof(test_packet));
+    test_packet->test1 = 16;
+    strcpy(test_packet->test2, "This is a test packet");
+    test_packet->test3 = 3.5;
+    test_packet->test4 = 64.56432f;
+    
+    sendDataClient(test_packet, sizeof(TestPacket_t), PACKET_TEST);
     
     return false;
 }
@@ -98,14 +99,47 @@ void updateServerNetwork()
     if (!network->server_running) return;
     
     if ((network->server.recv_len = recvfrom(network->server.socket, network->server.buffer, 512, 0, &network->server.si_other, &network->server.slen)) != SOCKET_ERROR) {
-        printf("Received data from: %s:%d\n", inet_ntoa(network->server.si_other.sin_addr), ntohs(network->server.si_other.sin_port));
-        printf("Data: %s\n", network->server.buffer);
-        pushlineOS(local_os, FormatText("Server received data: %s", network->server.buffer));
+        int packet_type = network->server.buffer[network->server.recv_len-1];
+        if (packet_type == PACKET_TEST) {
+            TestPacket_t* packet = (TestPacket_t*)malloc(sizeof(packet));
+            memcpy(packet, network->server.buffer, network->server.recv_len-1);
+            
+            pushlineOS(local_os, FormatText("received test packet: %d:%s:%f:%f\n", packet->test1, packet->test2, packet->test3, packet->test4));
+        }
+        
         memset(network->server.buffer, '\0', 512);
     }
-    
 }
 
 void updateClientNetwork()
 {
+    if (!network->client_running) return;
+    
+    if ((network->client.recv_len = recvfrom(network->client.socket, network->client.buffer, 512, 0, &network->client.si_other, &network->client.slen)) != SOCKET_ERROR) {
+        memset(network->client.buffer, '\0', 512);
+    }
+}
+
+bool sendDataClient(void* data, int size, int type)
+{
+    if (!network->client_running) return true;
+    
+    void* send = (void*)malloc(size+1);
+    memcpy(send, data, size);
+    memcpy(send+size, &type, 1);
+    printf("send data: %s:%d:%d\n", send, size);
+    if (sendto(network->client.socket, send, size+1, 0, &network->client.si_other, network->client.slen) == SOCKET_ERROR) {
+        printf("[NET][CLIENT] Failed to send packet\n");
+        free(send);
+        return true;
+    }
+    free(send);
+    
+    return false;
+}
+
+bool sendDataServer(void* data, int size, int type)
+{
+    if (!network->server_running) return true;
+    return false;
 }

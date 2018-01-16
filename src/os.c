@@ -45,16 +45,13 @@ bool commandOS(OS_t* os, char* command)
     else if (!strcmp(command, "clear")) {
         flashOS(local_os, NULL, 0);
     }
-    else if (!strcmp(command, "fuck")) {
-        pushlineOS(local_os, "I just did sex so hard to this girl. She was moaning and stuff and i did sex so hard and so good with her. She was all \"Please have good sex with me\" and I said back \"Yeah, I'm going to really sex you so great lady\" and she's like \"Thanks\". It was so good and so hot and we both loved making a sex on all the positions. At the end I was all \"Hey, I'm going to finish sex now\" and she said \"Yes, that would be nice if you finished so hard on that towel\". I said \"Yes\" and I finished so hard on the towel. And It was so hot.");
-    }
     else if (!strcmp(command, "buffer")) {
         for (int i = 0; i < os->line_length; i++) {
             printf("%s\n", os->lines[i]);
         }
     }
     else {
-        pushlineOS(local_os, "this string is way too long to fit in the max input size of the command line because im a terrible programmer and don't know what the fuck im doing");
+        pushlineOS(local_os, FormatText("Command '%s' was not found", command));
     }
     return false;
 }
@@ -133,16 +130,16 @@ void flashOS(OS_t* os, char lines[MAX_LINES][MAX_INPUT], int num_lines)
 void pushlineOS(OS_t* os, const char* line)
 {
     if (strlen(line) > MAX_INPUT) {
-        int n = 0;
-        while (n < strlen(line)) {
-            char str[MAX_INPUT];
-            for (int i = 0; i < MAX_INPUT-1; i++) {
-                str[i] = line[n+i];
-            }
-            str[MAX_INPUT] = '\0';
-            pushlineOS(os, str);
-            n+=MAX_INPUT-1;
-        }
+        char newline[MAX_INPUT];
+        char rest[strlen(line)-MAX_INPUT];
+        
+        memcpy(newline, &line[0], MAX_INPUT-1);
+        newline[MAX_INPUT] = '\0';
+        memcpy(rest, &line[MAX_INPUT-1], strlen(line)-MAX_INPUT);
+        rest[strlen(line)-MAX_INPUT] = '\0';
+        
+        pushlineOS(os, newline);
+        pushlineOS(os, rest);
         return;
     }
     if (os->line_length == MAX_LINES) {

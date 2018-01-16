@@ -24,6 +24,23 @@
 #include <string.h>
 
 #include "os.h"
+#include "clientpackets.h"
+
+typedef enum PACKET_TYPE {
+    PACKET_TEST=0,
+    PACKET_CONNECT,
+    PACKET_DISCONNECT,
+    PACKET_POSITON,
+    PACKET_CHAT
+} PACKET_TYPE;
+
+// shared packets
+typedef struct TestPacket_t {
+    int test1;
+    char test2[32];
+    double test3;
+    float test4;
+} TestPacket_t;
 
 typedef struct ServerData_t {
     SOCKET socket;
@@ -39,6 +56,7 @@ typedef struct ClientData_t {
     int slen, recv_len;
     char buffer[512];
     WSADATA wsa;
+    int uid;
 } ClientData_t;
 
 typedef struct Network_t {
@@ -52,9 +70,14 @@ static Network_t* network;
 
 bool initNetwork();
 void freeNetwork();
+
 bool startServerNetwork(int);
 bool startClientNetwork(const char*, int);
+
 void updateServerNetwork();
 void updateClientNetwork();
+
+bool sendDataClient(void*, int, int);
+bool sendDataServer(void*, int, int);
 
 #endif
