@@ -25,13 +25,17 @@
 
 #include "os.h"
 #include "clientpackets.h"
+#include "serverpackets.h"
+
+#define MAX_CLIENTS 8
 
 typedef enum PACKET_TYPE {
     PACKET_TEST=0,
     PACKET_CONNECT,
     PACKET_DISCONNECT,
     PACKET_POSITON,
-    PACKET_CHAT
+    PACKET_CHAT,
+    PACKET_UID
 } PACKET_TYPE;
 
 // shared packets
@@ -41,6 +45,13 @@ typedef struct TestPacket_t {
     double test3;
     float test4;
 } TestPacket_t;
+// shared packets
+
+typedef struct ClientInfo_t {
+    int uid;
+    int slen;
+    struct sockaddr_in si_other;
+} ClientInfo_t;
 
 typedef struct ServerData_t {
     SOCKET socket;
@@ -48,6 +59,8 @@ typedef struct ServerData_t {
     int slen, recv_len;
     char buffer[512];
     WSADATA wsa;
+    ClientInfo_t clients[MAX_CLIENTS];
+    int num_clients;
 } ServerData_t;
 
 typedef struct ClientData_t {
@@ -78,6 +91,6 @@ void updateServerNetwork();
 void updateClientNetwork();
 
 bool sendDataClient(void*, int, int);
-bool sendDataServer(void*, int, int);
+bool sendDataServer(void*, int, int, int);
 
 #endif

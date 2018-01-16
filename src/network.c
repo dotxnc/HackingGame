@@ -19,6 +19,7 @@ void freeNetwork()
 bool startServerNetwork(int port)
 {
     memset(network->server.buffer, '\0', 512);
+    network->server.num_clients = 0;
     
     if (WSAStartup(MAKEWORD(2,2),&network->server.wsa) != 0) {
         printf("[NET][SERVER] WSAStartup failed. (%d)\n", WSAGetLastError());
@@ -56,6 +57,7 @@ bool startServerNetwork(int port)
 
 bool startClientNetwork(const char* ip, int port)
 {
+    memset(network->client.buffer, '\0', 512);
     network->client.slen = sizeof(network->client.si_other);
     
     if (WSAStartup(MAKEWORD(2,2),&network->server.wsa) != 0) {
@@ -83,13 +85,9 @@ bool startClientNetwork(const char* ip, int port)
     
     network->client_running = true;
     
-    TestPacket_t* test_packet = (TestPacket_t*)malloc(sizeof(test_packet));
-    test_packet->test1 = 16;
-    strcpy(test_packet->test2, "This is a test packet");
-    test_packet->test3 = 3.5;
-    test_packet->test4 = 64.56432f;
-    
-    sendDataClient(test_packet, sizeof(TestPacket_t), PACKET_TEST);
+    ClientConnectPacket_t* conn_packet = (ClientConnectPacket_t*)malloc(sizeof(conn_packet));
+    conn_packet->buffer = -1;
+    sendDataClient(conn_packet, sizeof(conn_packet), PACKET_CONNECT);
     
     return false;
 }
@@ -100,13 +98,31 @@ void updateServerNetwork()
     
     if ((network->server.recv_len = recvfrom(network->server.socket, network->server.buffer, 512, 0, &network->server.si_other, &network->server.slen)) != SOCKET_ERROR) {
         int packet_type = network->server.buffer[network->server.recv_len-1];
-        if (packet_type == PACKET_TEST) {
-            TestPacket_t* packet = (TestPacket_t*)malloc(sizeof(packet));
-            memcpy(packet, network->server.buffer, network->server.recv_len-1);
-            
-            pushlineOS(local_os, FormatText("received test packet: %d:%s:%f:%f\n", packet->test1, packet->test2, packet->test3, packet->test4));
+        switch (packet_type)
+        {
+            case PACKET_TEST: {
+                TestPacket_t* packet = (TestPacket_t*)malloc(sizeof(packet));
+                memcpy(packet, network->server.buffer, network->server.recv_len-1);
+                pushlineOS(local_os, FormatText("received test packet: %d:%s:%f:%f\n", packet->test1, packet->test2, packet->test3, packet->test4));
+                free(packet);
+            } break;
+            case PACKET_CONNECT: {
+                if (network->server.num_clients < MAX_CLIENTS) {
+                    printf("[NET][SERVER] Connect packet received.. Adding client.");
+                    network->server.clients[network->server.num_clients].si_other = network->server.si_other;
+                    network->server.clients[network->server.num_clients].uid = network->server.num_clients;
+                    network->server.clients[network->server.num_clients].slen = network->server.slen;
+                    network->server.num_clients++;
+                    
+                    UIDPacket_t* uid_packet = (UIDPacket_t*)malloc(sizeof(uid_packet));
+                    uid_packet->uid = network->server.num_clients-1;
+                    sendDataServer(uid_packet, sizeof(uid_packet), PACKET_UID, uid_packet->uid);
+                }
+            } break;
+            default: {
+                printf("[NET][SERVER] Packet type not handled: %d\n", packet_type);
+            } break;
         }
-        
         memset(network->server.buffer, '\0', 512);
     }
 }
@@ -116,6 +132,20 @@ void updateClientNetwork()
     if (!network->client_running) return;
     
     if ((network->client.recv_len = recvfrom(network->client.socket, network->client.buffer, 512, 0, &network->client.si_other, &network->client.slen)) != SOCKET_ERROR) {
+        int packet_type = network->client.buffer[network->client.recv_len-1];
+        switch (packet_type)
+        {
+            case PACKET_UID: {
+                UIDPacket_t* packet = (UIDPacket_t*)malloc(sizeof(packet));
+                memcpy(packet, network->client.buffer, network->client.recv_len-1);
+                network->client.uid = packet->uid;
+                pushlineOS(local_os, FormatText("Client got uid: %d", packet->uid));
+                free(packet);
+            } break;
+            default: {
+                printf("[NET][CLIENT] Packet type not handled: %d\n", packet_type);
+            } break;
+        }
         memset(network->client.buffer, '\0', 512);
     }
 }
@@ -127,7 +157,6 @@ bool sendDataClient(void* data, int size, int type)
     void* send = (void*)malloc(size+1);
     memcpy(send, data, size);
     memcpy(send+size, &type, 1);
-    printf("send data: %s:%d:%d\n", send, size);
     if (sendto(network->client.socket, send, size+1, 0, &network->client.si_other, network->client.slen) == SOCKET_ERROR) {
         printf("[NET][CLIENT] Failed to send packet\n");
         free(send);
@@ -138,8 +167,38 @@ bool sendDataClient(void* data, int size, int type)
     return false;
 }
 
-bool sendDataServer(void* data, int size, int type)
+bool sendDataServer(void* data, int size, int type, int to)
 {
     if (!network->server_running) return true;
+    
+    void* send = (void*)malloc(size+1);
+    memcpy(send, data, size);
+    memcpy(send+size, &type, 1);
+    if (to > -1) {
+        ClientInfo_t* rec = NULL;
+        for (int i = 0; i < network->server.num_clients; i++) {
+            if (network->server.clients[i].uid == to) {
+                rec = &network->server.clients[i];
+                break;
+            }
+        }
+        if (rec != NULL) {
+            if (sendto(network->server.socket, send, size+1, 0, &rec->si_other, rec->slen) == SOCKET_ERROR) {
+                printf("[NET][SERVER] Failed to send packet\n");
+                free(send);
+                return true;
+            }
+        }
+    } else {
+        for (int i = 0; i < network->server.num_clients; i++) {
+            ClientInfo_t rec = network->server.clients[i];
+            if (sendto(network->server.socket, send, size+1, 0, &rec.si_other, rec.slen) == SOCKET_ERROR) {
+                printf("[NET][SERVER] Failed to send packet\n");
+                free(send);
+                return true;
+            }
+        }
+    }
+    free(send);
     return false;
 }
