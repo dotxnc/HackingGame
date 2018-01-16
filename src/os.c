@@ -90,7 +90,7 @@ void updateOS(OS_t* os)
             os->input[os->input_length] = (char)k;
             os->input_length++;
         }
-    } else if (k == 259) {
+    } else if (IsKeyPressed(KEY_BACKSPACE)) {
         if (os->input_length > 0) {
             os->input[os->input_length-1] = 0;
             os->input[os->input_length] = '\0';
@@ -101,7 +101,7 @@ void updateOS(OS_t* os)
             os->input[os->input_length] = ' ';
             os->input_length++;
         }
-    } else if (k == KEY_ENTER) {
+    } else if (IsKeyPressed(KEY_ENTER)) {
         commandOS(os, os->input);
         memset(os->input,0,strlen(os->input));
         os->input_length = 0;

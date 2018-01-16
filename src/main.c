@@ -62,7 +62,7 @@ int main(int argc, char** argv)
             Begin3dMode(camera);
                 drawPlayers();
                 DrawModel(tower, (Vector3){0, 0, -20}, 1.f, WHITE);
-                // drawScreen(&local_screen);
+                drawScreen(&local_screen);
             End3dMode();
             
             DrawText(FormatText("%s", local_os->grabbed ? "GRABBED" : "NOT GRABBED"), 10, 10, 20, WHITE);

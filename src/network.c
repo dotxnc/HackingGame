@@ -65,7 +65,7 @@ bool startClientNetwork(const char* ip, int port)
     network->client.slen = sizeof(network->client.si_other);
     network->client.num_players = 0;
     
-    if (WSAStartup(MAKEWORD(2,2),&network->server.wsa) != 0) {
+    if (WSAStartup(MAKEWORD(2,2),&network->client.wsa) != 0) {
         printf("[NET][CLIENT] WSAStartup failed. (%d)\n", WSAGetLastError());
         return true;
     }
@@ -96,14 +96,6 @@ bool startClientNetwork(const char* ip, int port)
     conn_packet->z = local_screen.pos.z;
     sendDataClient(conn_packet, sizeof(ClientConnectPacket_t), PACKET_CONNECT);
     free(conn_packet);
-    
-    TestPacket_t* test_packet = (TestPacket_t*)malloc(sizeof(TestPacket_t));
-    test_packet->test1 = 6;
-    strcpy(test_packet->test2, "This is a test packet");
-    test_packet->test3 = 3.14;
-    test_packet->test4 = 3.14159f;
-    sendDataClient(test_packet, sizeof(TestPacket_t), PACKET_TEST);;
-    free(test_packet);
     
     return false;
 }
@@ -262,14 +254,15 @@ bool sendDataServer(void* data, int size, int type, int to)
 
 void drawPlayers()
 {
-    drawScreen(&local_screen);
+    // drawScreen(&local_screen);
     if (!network->client_running) return;
     
     for (int i = 0; i < network->client.num_players; i++)
     {
         network->client.players[i].screen.pos.x = network->client.players[i].x;
         network->client.players[i].screen.pos.z = network->client.players[i].z;
-        drawScreen(&(network->client.players[i].screen));
+        if (network->client.players[i].uid != network->client.uid)
+            drawScreen(&(network->client.players[i].screen));
     }
 }
 
@@ -279,6 +272,6 @@ void drawPlayerList()
     
     for (int i = 0; i < network->client.num_players; i++)
     {
-        DrawText(FormatText("Player: %f : %f", network->client.players[i].screen.pos.x, network->client.players[i].screen.pos.z), 10, 50+i*15, 10, WHITE);
+        DrawText(FormatText("Player (%d:%d): %f : %f", i, network->client.players[i].uid, network->client.players[i].screen.pos.x, network->client.players[i].screen.pos.z), 10, 50+i*15, 10, WHITE);
     }
 }

@@ -8,7 +8,7 @@ static Model screen_viewer;
 
 static Mesh screen_mesh;
 
-static Vector3 screen_offset = {-0.4, 2.6, .5};
+static Vector3 screen_offset;
 
 void loadScreenModels(Shader lighting)
 {
@@ -34,6 +34,11 @@ void loadScreenModels(Shader lighting)
     local_screen.pos = (Vector3){0,0,0};
     local_screen.in_use = false;
     local_screen.texture = LoadRenderTexture(screen_w*screen_w_gl, screen_h*screen_h_gl);
+    
+    // screen_offset = {-0.4, 2.6, .5};
+    screen_offset.x = -0.4f;
+    screen_offset.y = 2.6f;
+    screen_offset.z = 0.5f;
 }
 
 void freeScreenModels()
@@ -49,7 +54,6 @@ void freeScreenModels()
 
 void drawScreen(Screen_t* screen)
 {
-    // printf("Drawing: %f %f\n", screen->pos.x, screen->pos.z);
     SetTextureFilter(screen->texture.texture, FILTER_POINT);
     
     DrawModel(screen_desk, screen->pos, 1.f, GRAY);
