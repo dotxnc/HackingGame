@@ -51,7 +51,9 @@ bool commandOS(OS_t* os, char* command)
         }
     }
     else {
-        pushlineOS(local_os, FormatText("Command '%s' was not found", command));
+        char buffer[MAX_INPUT*2] = {0};
+        snprintf(buffer, MAX_INPUT*2, "Command '%s' was not found\0", command);
+        pushlineOS(local_os, buffer);
     }
     return false;
 }
@@ -97,7 +99,7 @@ void updateOS(OS_t* os)
             os->input_length--;
         }
     } else if (k == 32) {
-        if (os->input_length < 52) {
+        if (os->input_length < MAX_INPUT) {
             os->input[os->input_length] = ' ';
             os->input_length++;
         }
@@ -131,12 +133,12 @@ void pushlineOS(OS_t* os, const char* line)
 {
     if (strlen(line) > MAX_INPUT) {
         char newline[MAX_INPUT];
-        char rest[strlen(line)-MAX_INPUT];
+        char rest[strlen(line)-MAX_INPUT+2];
         
         memcpy(newline, &line[0], MAX_INPUT-1);
-        newline[MAX_INPUT] = '\0';
-        memcpy(rest, &line[MAX_INPUT-1], strlen(line)-MAX_INPUT);
-        rest[strlen(line)-MAX_INPUT] = '\0';
+        newline[MAX_INPUT-1] = '\0';
+        memcpy(rest, &line[MAX_INPUT-1], strlen(line)-MAX_INPUT+1);
+        rest[strlen(line)-MAX_INPUT+1] = '\0';
         
         pushlineOS(os, newline);
         pushlineOS(os, rest);
@@ -156,7 +158,7 @@ void drawOS(OS_t* os, Screen_t* scr)
 {
     DrawRectangle(0, 0, scr->texture.texture.width*screen_w_gl, scr->texture.texture.height*screen_h_gl, BLACK);
     for (int i = 0; i < MAX_LINES; i++) {
-        DrawText(FormatText("%s", os->lines[i]), 5, 5+i*22, 20, GREEN);
+        DrawText(os->lines[i], 5, 5+i*22, 20, GREEN);
     }
     int iw = MeasureText(FormatText(">%s", os->input), 20);
     DrawText(FormatText(">%s", os->input), 5, 5+os->line_length*22, 20, GREEN);
