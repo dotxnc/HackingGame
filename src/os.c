@@ -28,7 +28,7 @@ bool commandOS(OS_t* os, char* command)
         return true;
     }
     else if (!strcmp(command, "client")) {
-        if (startClientNetwork("192.168.1.203", 7373)) {
+        if (startClientNetwork("127.0.0.1", 7373)) {
             pushlineOS(os, "FAILED TO START CLIENT");
         } else {
             pushlineOS(os, "CREATED CLIENT SUCCESSFULY");
@@ -144,12 +144,12 @@ void pushlineOS(OS_t* os, const char* line)
     }
     if (os->line_length == MAX_LINES) {
         for (int i = 0; i < MAX_LINES-1; i++) {
-            strcpy(os->lines[i], os->lines[i+1]);
+            memcpy(os->lines[i], os->lines[i+1], strlen(os->lines[i+1]));
         }
     } else {
         os->line_length++;
     }
-    strcpy(os->lines[os->line_length-1], line);
+    memcpy(os->lines[os->line_length-1], line, strlen(line));
 }
 
 void drawOS(OS_t* os, Screen_t* scr)

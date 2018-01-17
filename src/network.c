@@ -260,6 +260,7 @@ void drawPlayers()
     for (int i = 0; i < network->client.num_players; i++)
     {
         network->client.players[i].screen.pos.x = network->client.players[i].x;
+        network->client.players[i].screen.pos.y = 0;
         network->client.players[i].screen.pos.z = network->client.players[i].z;
         if (network->client.players[i].uid != network->client.uid)
             drawScreen(&(network->client.players[i].screen));

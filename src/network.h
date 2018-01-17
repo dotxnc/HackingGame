@@ -92,7 +92,7 @@ typedef struct Network_t {
     ClientData_t client;
 } Network_t;
 
-static Network_t* network;
+Network_t* network;
 
 bool initNetwork();
 void freeNetwork();
