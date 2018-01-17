@@ -6,12 +6,16 @@
 
 #include <raylib.h>
 #include <raymath.h>
+#define CAMERA_IMPLEMENTATION
+#include "camera.h"
 
 #include "network.h"
 #include "screen.h"
 #include "os.h"
 
 Vector3 monitor_pos = (Vector3){0.3, 2.6, 1.25};
+float post = 0.f;
+PlayerPositionPacket_t ppos;
 
 void updatePlayerScreen(Screen_t*);
 
@@ -26,6 +30,7 @@ int main(int argc, char** argv)
     initOS(NULL);
     
     Shader shader = LoadShader("assets/base.glsl", "assets/lighting.glsl");
+    shader.locs[LOC_MATRIX_MODEL] = GetShaderLocation(shader, "modelMatrix");
     loadScreenModels(shader);
     
     local_screen.pos.x = -20+rand()%40;
@@ -35,6 +40,8 @@ int main(int argc, char** argv)
     int HEIGHT = screen_h * screen_h_gl;
     
     Camera camera = {{ local_screen.pos.x+3.0f, 3.65f, local_screen.pos.z+3.0f }, { 0.0f, 1.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, 90.0f };
+    ppos.x = camera.position.x;
+    ppos.z = camera.position.z;
     
     Model tower = LoadModel("assets/game/Tower.obj");
     tower.material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/game/Tower.png");
@@ -46,6 +53,18 @@ int main(int argc, char** argv)
     
     while (!WindowShouldClose())
     {
+        if (network->client_running) {
+            post += GetFrameTime();
+            if (post > 1.f/30.f) {
+                post = 0.f;
+                ppos.uid = network->client.uid;
+                ppos.x = camera.position.x;
+                ppos.z = camera.position.z;
+                ppos.rot = cameraAngle.x+PI;
+                sendDataClient(&ppos, sizeof(PlayerPositionPacket_t), PACKET_POSITION);
+            }
+        }
+        
         updateClientNetwork();
         updateServerNetwork();
         
@@ -66,6 +85,7 @@ int main(int argc, char** argv)
             End3dMode();
             
             DrawText(FormatText("%s", local_os->grabbed ? "GRABBED" : "NOT GRABBED"), 10, 10, 20, WHITE);
+            DrawText(FormatText("%02f %02f", cameraAngle.x, cameraAngle.y), 300, 10, 20, WHITE);
             drawPlayerList();
         
         EndDrawing();

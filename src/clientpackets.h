@@ -10,4 +10,11 @@ typedef struct ClientConnectPacket_t {
     float z;
 } ClientConnectPacket_t;
 
+typedef struct PlayerPositionPacket_t {
+    float uid;
+    float x;
+    float z;
+    float rot;
+} PlayerPositionPacket_t;
+
 #endif

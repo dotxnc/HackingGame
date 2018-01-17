@@ -34,7 +34,7 @@ typedef enum PACKET_TYPE {
     PACKET_TEST=0,
     PACKET_CONNECT,
     PACKET_DISCONNECT,
-    PACKET_POSITON,
+    PACKET_POSITION,
     PACKET_CHAT,
     PACKET_UID,
     PACKET_NEWPLAYER
@@ -55,12 +55,18 @@ typedef struct ClientInfo_t {
     struct sockaddr_in si_other;
     float x;
     float z;
+    float rx;
+    float rz;
+    float rot;
 } ClientInfo_t;
 
 typedef struct PlayerInfo_t {
     int uid;
     float x;
     float z;
+    float rx;
+    float rz;
+    float rot;
     Screen_t screen;
 } PlayerInfo_t;
 

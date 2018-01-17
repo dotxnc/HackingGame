@@ -108,7 +108,7 @@ void updateServerNetwork()
     
     if ((network->server.recv_len = recvfrom(network->server.socket, network->server.buffer, 512, 0, &network->server.si_other, &network->server.slen)) != SOCKET_ERROR) {
         int packet_type = network->server.buffer[network->server.recv_len-1];
-        printf("[NET][SERVER] Received packet of type %d\n", packet_type);
+        // printf("[NET][SERVER] Received packet of type %d\n", packet_type);
         switch (packet_type)
         {
             case PACKET_TEST: {
@@ -128,6 +128,9 @@ void updateServerNetwork()
                     network->server.clients[network->server.num_clients].slen = network->server.slen;
                     network->server.clients[network->server.num_clients].x = packet->x;
                     network->server.clients[network->server.num_clients].z = packet->z;
+                    network->server.clients[network->server.num_clients].rx = 0;
+                    network->server.clients[network->server.num_clients].rz = 0;
+                    network->server.clients[network->server.num_clients].rot = 0;
                     network->server.num_clients++;
                     
                     UIDPacket_t* uid_packet = (UIDPacket_t*)malloc(sizeof(UIDPacket_t));
@@ -156,6 +159,14 @@ void updateServerNetwork()
                     free(packet);
                 }
             } break;
+            case PACKET_POSITION: {
+                PlayerPositionPacket_t* packet = (PlayerPositionPacket_t*)malloc(sizeof(PlayerPositionPacket_t));
+                memcpy(packet, network->server.buffer, network->server.recv_len-1);
+                for (int i = 0; i < network->server.num_clients; i++) {
+                    sendDataServer(packet, sizeof(PlayerPositionPacket_t), PACKET_POSITION, network->server.clients[i].uid);
+                }
+                free(packet);
+            } break;
             default: {
                 printf("[NET][SERVER] Packet type not handled: %d\n", packet_type);
             } break;
@@ -170,7 +181,7 @@ void updateClientNetwork()
     
     if ((network->client.recv_len = recvfrom(network->client.socket, network->client.buffer, 512, 0, &network->client.si_other, &network->client.slen)) != SOCKET_ERROR) {
         int packet_type = network->client.buffer[network->client.recv_len-1];
-        printf("[NET][CLIENT] Received packet of type %d\n", packet_type);
+        // printf("[NET][CLIENT] Received packet of type %d\n", packet_type);
         switch (packet_type)
         {
             case PACKET_UID: {
@@ -180,7 +191,6 @@ void updateClientNetwork()
                 pushlineOS(local_os, FormatText("Client got uid: %d", packet->uid));
                 free(packet);
             } break;
-            
             case PACKET_NEWPLAYER: {
                 NewPlayerPacket_t* packet = (NewPlayerPacket_t*)malloc(sizeof(NewPlayerPacket_t));
                 memcpy(packet, network->client.buffer, network->client.recv_len-1);
@@ -189,12 +199,27 @@ void updateClientNetwork()
                     network->client.players[network->client.num_players].uid = packet->uid;
                     network->client.players[network->client.num_players].x = packet->x;
                     network->client.players[network->client.num_players].z = packet->z;
+                    network->client.players[network->client.num_players].rx = 0;
+                    network->client.players[network->client.num_players].rz = 0;
+                    network->client.players[network->client.num_players].rot = 0;
                     network->client.players[network->client.num_players].screen.texture = LoadRenderTexture(screen_w*screen_w_gl, screen_h*screen_h_gl);
                     network->client.num_players++;
                 }
                 free(packet);
             } break;
-            
+            case PACKET_POSITION: {
+                PlayerPositionPacket_t* packet = (PlayerPositionPacket_t*)malloc(sizeof(PlayerPositionPacket_t));
+                memcpy(packet, network->client.buffer, network->client.recv_len-1);
+                for (int i = 0; i < network->client.num_players; i++) {
+                    if (network->client.players[i].uid == packet->uid) {
+                        network->client.players[i].rx = packet->x;
+                        network->client.players[i].rz = packet->z;
+                        network->client.players[i].rot = packet->rot;
+                        break;
+                    }
+                }
+                free(packet);
+            } break;
             default: {
                 printf("[NET][CLIENT] Packet type not handled: %d\n", packet_type);
             } break;
@@ -216,7 +241,7 @@ bool sendDataClient(void* data, int size, int type)
         return true;
     }
     free(send);
-    printf("[NET][CLIENT] Sent packet of type %d\n", type);
+    // printf("[NET][CLIENT] Sent packet of type %d\n", type);
     
     return false;
 }
@@ -253,7 +278,7 @@ bool sendDataServer(void* data, int size, int type, int to)
             }
         }
     }
-    printf("[NET][SERVER] Send packet of type %d to %d\n", type, to);
+    // printf("[NET][SERVER] Send packet of type %d to %d\n", type, to);
     free(send);
     return false;
 }
@@ -267,8 +292,13 @@ void drawPlayers()
         network->client.players[i].screen.pos.x = network->client.players[i].x;
         network->client.players[i].screen.pos.y = 0;
         network->client.players[i].screen.pos.z = network->client.players[i].z;
-        if (network->client.players[i].uid != network->client.uid)
+        network->client.players[i].screen.realpos.x = network->client.players[i].rx;
+        network->client.players[i].screen.realpos.y = 0;
+        network->client.players[i].screen.realpos.z = network->client.players[i].rz;
+        if (network->client.players[i].uid != network->client.uid) {
             drawScreen(&(network->client.players[i].screen));
+            drawPlayer(&(network->client.players[i].screen), -network->client.players[i].rot);
+        }
     }
 }
 
