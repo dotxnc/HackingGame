@@ -22,6 +22,7 @@ bool startServerNetwork(int port)
     
     memset(network->server.buffer, '\0', 512);
     network->server.num_clients = 0;
+    network->server.slen = sizeof(network->server.si_other);
     
     if (WSAStartup(MAKEWORD(2,2),&network->server.wsa) != 0) {
         printf("[NET][SERVER] WSAStartup failed. (%d)\n", WSAGetLastError());
@@ -103,9 +104,11 @@ bool startClientNetwork(const char* ip, int port)
 void updateServerNetwork()
 {
     if (!network->server_running) return;
+    // printf("updating server\n");
     
     if ((network->server.recv_len = recvfrom(network->server.socket, network->server.buffer, 512, 0, &network->server.si_other, &network->server.slen)) != SOCKET_ERROR) {
         int packet_type = network->server.buffer[network->server.recv_len-1];
+        printf("[NET][SERVER] Received packet of type %d\n", packet_type);
         switch (packet_type)
         {
             case PACKET_TEST: {
@@ -167,6 +170,7 @@ void updateClientNetwork()
     
     if ((network->client.recv_len = recvfrom(network->client.socket, network->client.buffer, 512, 0, &network->client.si_other, &network->client.slen)) != SOCKET_ERROR) {
         int packet_type = network->client.buffer[network->client.recv_len-1];
+        printf("[NET][CLIENT] Received packet of type %d\n", packet_type);
         switch (packet_type)
         {
             case PACKET_UID: {
@@ -212,6 +216,7 @@ bool sendDataClient(void* data, int size, int type)
         return true;
     }
     free(send);
+    printf("[NET][CLIENT] Sent packet of type %d\n", type);
     
     return false;
 }
@@ -248,13 +253,13 @@ bool sendDataServer(void* data, int size, int type, int to)
             }
         }
     }
+    printf("[NET][SERVER] Send packet of type %d to %d\n", type, to);
     free(send);
     return false;
 }
 
 void drawPlayers()
 {
-    // drawScreen(&local_screen);
     if (!network->client_running) return;
     
     for (int i = 0; i < network->client.num_players; i++)

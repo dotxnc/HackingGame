@@ -1,11 +1,11 @@
 rwildcard = $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst *,%,$2),$d))
 SRC = $(call rwildcard, src/, *.c) #$(wildcard src/*.cpp) $(wildcard src/engine/*.cpp)
 OBJ = $(patsubst src/%.c, obj/%.o, $(SRC))
-CFLAGS = --std=c11 -Wl,-allow-multiple-definition -Wno-incompatible-pointer-types -Wno-int-conversion -Isrc/ -static-libgcc -static
+CFLAGS = --std=c11 -Wl,-allow-multiple-definition -Wno-incompatible-pointer-types -Wno-int-conversion -Isrc/
 OUT = hacking
 
-LDFLAGS = -lraylib -lOpenAL32 -lglfw3 -lopengl32 -lenet64 -lgdi32 -lws2_32
-# LDFLAGS = -lmingw32 -lraylib -lSDL2_net -mwindows -Wl,--no-undefined -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lversion -luuid -static-libgcc
+LDFLAGS = -lraylib -lOpenAL32 -lglfw3 -lopengl32 -lgdi32 -lws2_32
+# LDFLAGS = -lmingw32 -lraylib -mwindows -Wl,--no-undefined -lws2_32 -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lversion -luuid -static-libgcc
 LIBS = 
 CC = gcc
 
