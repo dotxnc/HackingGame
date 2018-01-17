@@ -29,6 +29,8 @@
 #include "screen.h"
 
 #define MAX_CLIENTS 8
+#define DEFAULT_PORT 27015
+#define DEFAULT_IP "127.0.0.1"
 
 typedef enum PACKET_TYPE {
     PACKET_TEST=0,

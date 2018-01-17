@@ -83,7 +83,7 @@ void drawPlayer(Screen_t* screen, float rot)
     Matrix m = MatrixIdentity();
     m = MatrixMultiply(m, MatrixRotateY(rot));
     screen_player.transform = m;
-    DrawModel(screen_player, screen->realpos, 1.f, GRAY);
+    DrawModel(screen_player, screen->realpos, 0.85f, GRAY);
 }
 
 

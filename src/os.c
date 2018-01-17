@@ -19,33 +19,61 @@ void freeOS(OS_t* os)
 
 bool commandOS(OS_t* os, char* command)
 {
-    if (!strcmp(command, "server")) {
-        if (startServerNetwork(7373)) {
+    
+    char args[MAX_ARGS][MAX_INPUT];
+    int argc = 0;
+    char* pch;
+    pch = strtok(command, " ");
+    int i=0;
+    while (pch != NULL) {
+        if (i<MAX_ARGS) {
+            strcpy(args[i], pch);
+            pch = strtok(NULL, " ");
+            i++;
+            argc++;
+        } else {
+            pch=strtok(args[i], "");
+        }
+    }
+    free(pch);
+    
+    if (!strcmp(args[0], "server")) {
+        int port = atoi(args[1]);
+        if (argc < 2) {
+            port = DEFAULT_PORT;
+        }
+        if (startServerNetwork(port)) {
             pushlineOS(os, "FAILED TO CREATE SERVER");
         } else {
             pushlineOS(os, "STARTED SERVER SUCCESSFULY");
         }
         return true;
     }
-    else if (!strcmp(command, "client")) {
-        if (startClientNetwork("127.0.0.1", 7373)) {
+    else if (!strcmp(args[0], "client")) {
+        int port = atoi(args[2]);
+        char* ip = args[1];
+        if (argc < 3) {
+            port = DEFAULT_PORT;
+            ip = DEFAULT_IP;
+        }
+        if (startClientNetwork(ip, port)) {
             pushlineOS(os, "FAILED TO START CLIENT");
         } else {
             pushlineOS(os, "CREATED CLIENT SUCCESSFULY");
         }
         return true;
     }
-    else if (!strcmp(command, "test")) {
+    else if (!strcmp(args[0], "test")) {
         for (int i = 0; i < 20; i++) {
             // pushlineOS(os, "test line");
             pushlineOS(os, FormatText("test line %d", i));
         }
         return true;
     }
-    else if (!strcmp(command, "clear")) {
+    else if (!strcmp(args[0], "clear")) {
         flashOS(local_os, NULL, 0);
     }
-    else if (!strcmp(command, "buffer")) {
+    else if (!strcmp(args[0], "buffer")) {
         for (int i = 0; i < os->line_length; i++) {
             printf("%s\n", os->lines[i]);
         }
@@ -105,11 +133,11 @@ void updateOS(OS_t* os)
         }
     } else if (IsKeyPressed(KEY_ENTER)) {
         commandOS(os, os->input);
-        memset(os->input,0,strlen(os->input));
+        memset(os->input,'\0',MAX_INPUT);
         os->input_length = 0;
     }
     else if (k > -1) {
-        printf("%d\n", k);
+        // printf("%d\n", k);
     }
 }
 
@@ -117,7 +145,7 @@ void flashOS(OS_t* os, char lines[MAX_LINES][MAX_INPUT], int num_lines)
 {
     if (lines == NULL) {
         for (int i = 0; i < MAX_LINES; i++) {
-            pushlineOS(os, "");
+            memset(os->lines[i], '\0', MAX_INPUT);
         }
         os->line_length = 0;
         return;

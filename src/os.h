@@ -12,6 +12,7 @@
 
 #define MAX_INPUT 45
 #define MAX_LINES 23
+#define MAX_ARGS 5
 
 const char* const clist = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()-=_+:;\"'<>?,./";
 
