@@ -33,6 +33,7 @@ void loadScreenModels(Shader lighting)
     screen_keyboard.material.shader = lighting;
     screen_mouse.material.shader = lighting;
     screen_player.material.shader = lighting;
+    // screen_viewer.material.shader = lighting;
     
     // local_screen = (Screen_t*)malloc(sizeof(local_screen));
     local_screen.pos = (Vector3){0,0,0};

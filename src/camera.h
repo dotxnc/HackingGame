@@ -175,7 +175,7 @@ void SetCameraMoveControls(int frontKey, int backKey,
 #define CAMERA_THIRD_PERSON_OFFSET                      (Vector3){ 0.4f, 0.0f, 0.0f }
 
 // PLAYER (used by camera)
-#define PLAYER_MOVEMENT_SENSITIVITY                     20.0f
+float PLAYER_MOVEMENT_SENSITIVITY                     = 20.0f;
 
 //----------------------------------------------------------------------------------
 // Types and Structures Definition

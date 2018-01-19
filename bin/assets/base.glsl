@@ -29,5 +29,7 @@ void main()
     
     // Calculate final vertex position
     gl_Position = mvp*vec4(vertexPosition, 1.0);
+    gl_Position.xy = floor(gl_Position.xy*80)/80;
+    // gl_Position.xy = floor(gl_Position.xy);
     // gl_Position.xy = floor(gl_Position.xy*gl_Position.w*(4*8))*(.25f/8)/gl_Position.w;
 }

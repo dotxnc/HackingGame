@@ -68,10 +68,17 @@ int main(int argc, char** argv)
         updateClientNetwork();
         updateServerNetwork();
         
-        updateOS(local_os);
-        if (!local_os->grabbed) {
+        updateOS(&local_os);
+        if (!local_os.grabbed) {
+            if (IsKeyDown(KEY_LEFT_SHIFT)) {
+                PLAYER_MOVEMENT_SENSITIVITY = 15.f;
+            } else {
+                PLAYER_MOVEMENT_SENSITIVITY = 20.f;
+            }
             UpdateCamera(&camera);
         }
+        // printf("IS IT FUCKING GRABBED? %s\n", local_os->grabbed ? "fucking yes" : "lol fuck off");
+        
         
         BeginDrawing();
             
@@ -84,9 +91,9 @@ int main(int argc, char** argv)
                 drawScreen(&local_screen);
             End3dMode();
             
-            DrawText(FormatText("%s", local_os->grabbed ? "GRABBED" : "NOT GRABBED"), 10, 10, 20, WHITE);
-            DrawText(FormatText("%02f %02f", cameraAngle.x, cameraAngle.y), 300, 10, 20, WHITE);
-            drawPlayerList();
+            DrawText(local_os.grabbed ? "GRABBED" : "NOT GRABBED", 10, 10, 20, WHITE);
+            
+            //drawPlayerList();
         
         EndDrawing();
         
@@ -104,7 +111,5 @@ int main(int argc, char** argv)
 
 void updatePlayerScreen(Screen_t* scr)
 {
-    BeginTextureMode(scr->texture);
-    drawOS(local_os, scr);
-    EndTextureMode();
+    drawOS(&local_os, scr);
 }

@@ -113,7 +113,7 @@ void updateServerNetwork()
             case PACKET_TEST: {
                 TestPacket_t* packet = (TestPacket_t*)malloc(sizeof(TestPacket_t));
                 memcpy(packet, network->server.buffer, network->server.recv_len-1);
-                pushlineOS(local_os, FormatText("received test packet: %d:%s:%f:%f\n", packet->test1, packet->test2, packet->test3, packet->test4));
+                pushlineOS(&local_os, FormatText("received test packet: %d:%s:%f:%f\n", packet->test1, packet->test2, packet->test3, packet->test4));
                 free(packet);
             } break;
             case PACKET_CONNECT: {
@@ -186,7 +186,7 @@ void updateClientNetwork()
                 UIDPacket_t* packet = (UIDPacket_t*)malloc(sizeof(UIDPacket_t));
                 memcpy(packet, network->client.buffer, network->client.recv_len-1);
                 network->client.uid = packet->uid;
-                pushlineOS(local_os, FormatText("Client got uid: %d", packet->uid));
+                pushlineOS(&local_os, FormatText("Client got uid: %d", packet->uid));
                 free(packet);
             } break;
             case PACKET_NEWPLAYER: {
