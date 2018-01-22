@@ -1,0 +1,6 @@
+bin/hacking*
+bin/hacking
+bin/hacking.exe
+obj/
+.vscode/
+!.gitignore

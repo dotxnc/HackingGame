@@ -5,6 +5,7 @@ CFLAGS = --std=c11 -Wl,-allow-multiple-definition -Wno-incompatible-pointer-type
 OUT = hacking
 
 LDFLAGS = -lraylib -lOpenAL32 -lglfw3 -lopengl32 -lgdi32 -lws2_32
+LDFLAGS = -lraylib -lglfw3 -lGL -lX11 -lm -lpthread -ldl
 # LDFLAGS = -lmingw32 -lraylib -mwindows -Wl,--no-undefined -lws2_32 -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lversion -luuid -static-libgcc
 LIBS = 
 CC = gcc
@@ -20,4 +21,3 @@ obj/%.o: src/%.c
 clean:
 	rm -r obj/*
 	rm bin/$(OUT)
-
