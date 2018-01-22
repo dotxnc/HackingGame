@@ -13,6 +13,12 @@ uniform vec4 ambientLight = vec4(0.15f, 0.15f, 0.15f, 1.f);
 
 out vec4 finalColor;
 
+float fog(const float dist, const float density)
+{
+    const float l2 = -1.442695;
+    float d = density*dist;
+    return 1.0 - clamp(exp2(d*d*l2), 0.0, 1.0);
+}
 
 void main()
 {
@@ -33,6 +39,11 @@ void main()
     
     color = clamp(color, 0.0f, 1.0f);
     
-    finalColor = color*textureColor;
+    vec4 c = color*textureColor;
+    float fogDistance = gl_FragCoord.z/gl_FragCoord.w;
+    float fogAmount = fog(fogDistance, 0.05f);
+    const vec4 fogColor = vec4(0.0);
+    
+    finalColor = vec4(mix(c, fogColor, fogAmount).rgb, 1.0);
     
 }
