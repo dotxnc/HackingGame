@@ -13,7 +13,7 @@
 #include "screen.h"
 #include "os.h"
 
-Vector3 monitor_pos = (Vector3){0.3, 2.6, 1.25};
+Vector3 monitor_pos;
 float post = 0.f;
 PlayerPositionPacket_t ppos;
 
@@ -21,6 +21,8 @@ void updatePlayerScreen(Screen_t*);
 
 int main(int argc, char** argv)
 {
+    monitor_pos = (Vector3){0.3, 2.6, 1.25};
+    
     initNetwork();
     
     InitWindow(640, 480, "Hack");

@@ -1,22 +1,36 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
-#define WITHOUT_SDL
-#define CloseWindow CloseWindow_orig
-#define Rectangle Rectangle_orig
-#define ShowCursor ShowCursor_orig
-#define LoadImage LoadImage_orig
-#define DrawText DrawText_orig
-#define DrawTextEx DrawTextEx_orig
-#define PlaySound PlaySound_orig
-#include <winsock2.h>
-#undef CloseWindow
-#undef Rectangle
-#undef ShowCursor
-#undef LoadImage
-#undef DrawText
-#undef DrawTextEx
-#undef PlaySound
+#ifdef _WIN32
+    #define WITHOUT_SDL
+    #define CloseWindow CloseWindow_orig
+    #define Rectangle Rectangle_orig
+    #define ShowCursor ShowCursor_orig
+    #define LoadImage LoadImage_orig
+    #define DrawText DrawText_orig
+    #define DrawTextEx DrawTextEx_orig
+    #define PlaySound PlaySound_orig
+    #include <winsock2.h>
+    #undef CloseWindow
+    #undef Rectangle
+    #undef ShowCursor
+    #undef LoadImage
+    #undef DrawText
+    #undef DrawTextEx
+    #undef PlaySound
+    #define HACK_GETERROR() WSAGetLastError()
+#else
+    // TODO: include posix socket headers
+    #include <sys/types.h>
+    #include <sys/socket.h>
+    #include <sys/ioctl.h>
+    #include <sys/unistd.h>
+    #include <arpa/inet.h>
+    #define INVALID_SOCKET -1
+    #define SOCKET_ERROR -1
+    #define ioctlsocket ioctl
+    #define HACK_GETERROR() "Error not specified on *nix"
+#endif
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -73,21 +87,29 @@ typedef struct PlayerInfo_t {
 } PlayerInfo_t;
 
 typedef struct ServerData_t {
-    SOCKET socket;
+    #ifdef _WIN32
+        WSADATA wsa;
+        SOCKET socket;
+    #else
+        int socket;
+    #endif
     struct sockaddr_in addr, si_other;
     int slen, recv_len;
     char buffer[512];
-    WSADATA wsa;
     ClientInfo_t clients[MAX_CLIENTS];
     int num_clients;
 } ServerData_t;
 
 typedef struct ClientData_t {
-    SOCKET socket;
+    #ifdef _WIN32
+        WSADATA wsa;
+        SOCKET socket;
+    #else
+        int socket;
+    #endif
     struct sockaddr_in si_other;
     int slen, recv_len;
     char buffer[512];
-    WSADATA wsa;
     int uid;
     PlayerInfo_t players[MAX_CLIENTS];
     int num_players;

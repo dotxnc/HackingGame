@@ -1,4 +1,5 @@
 #version 330
+#pragma GL_ARB_shading_language_420pack : enable
 
 in vec2 fragTexCoord;
 in vec4 fragColor;
@@ -6,9 +7,9 @@ in vec3 fragNormal;
 
 uniform sampler2D texture0;
 
-uniform vec3 lightDirection = {1.f, -0.3f, -0.5f};
-uniform vec4 diffuseLightColor = {1.f, 1.f, 1.f, 1.f};
-uniform vec4 ambientLight = {0.15f, 0.15f, 0.15f, 1.f};
+uniform vec3 lightDirection = vec3(1.f, -0.3f, -0.5f);
+uniform vec4 diffuseLightColor = vec4(1.f, 1.f, 1.f, 1.f);
+uniform vec4 ambientLight = vec4(0.15f, 0.15f, 0.15f, 1.f);
 
 out vec4 finalColor;
 

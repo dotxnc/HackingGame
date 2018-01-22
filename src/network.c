@@ -11,9 +11,14 @@ bool initNetwork()
 
 void freeNetwork()
 {
-    closesocket(network->server.socket);
-    closesocket(network->client.socket);
-    WSACleanup();
+    #ifdef _WIN32  
+        closesocket(network->server.socket);
+        closesocket(network->client.socket);
+        WSACleanup();
+    #else
+        close(network->server.socket);
+        close(network->client.socket);
+    #endif
 }
 
 bool startServerNetwork(int port)
@@ -24,14 +29,16 @@ bool startServerNetwork(int port)
     network->server.num_clients = 0;
     network->server.slen = sizeof(network->server.si_other);
     
-    if (WSAStartup(MAKEWORD(2,2),&network->server.wsa) != 0) {
-        printf("[NET][SERVER] WSAStartup failed. (%d)\n", WSAGetLastError());
-        return true;
-    }
-    printf("[NET][SERVER] WSAStartup succeeded\n");
+    #ifdef _WIN32
+        if (WSAStartup(MAKEWORD(2,2),&network->server.wsa) != 0) {
+            printf("[NET][SERVER] WSAStartup failed. (%d)\n", HACK_GETERROR());
+            return true;
+        }
+        printf("[NET][SERVER] WSAStartup succeeded\n");
+    #endif
     
     if ((network->server.socket = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET) {
-        printf("[NET][SERVER] Could not create socket. (%d)\n", WSAGetLastError());
+        printf("[NET][SERVER] Could not create socket. (%d)\n", HACK_GETERROR());
         return true;
     }
     printf("[NET][SERVER] Created server socket\n");
@@ -66,21 +73,27 @@ bool startClientNetwork(const char* ip, int port)
     network->client.slen = sizeof(network->client.si_other);
     network->client.num_players = 0;
     
-    if (WSAStartup(MAKEWORD(2,2),&network->client.wsa) != 0) {
-        printf("[NET][CLIENT] WSAStartup failed. (%d)\n", WSAGetLastError());
-        return true;
-    }
-    printf("[NET][CLIENT] WSAStartup succeeded\n");
+    #ifdef _WIN32
+        if (WSAStartup(MAKEWORD(2,2),&network->client.wsa) != 0) {
+            printf("[NET][CLIENT] WSAStartup failed. (%d)\n", HACK_GETERROR());
+            return true;
+        }
+        printf("[NET][CLIENT] WSAStartup succeeded\n");
+    #endif
     
     if ((network->client.socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == SOCKET_ERROR) {
-        printf("[NET][CLIENT] Could not create socket. (%d)\n", WSAGetLastError());
+        printf("[NET][CLIENT] Could not create socket. (%d)\n", HACK_GETERROR());
         return true;
     }
     printf("[NET][CLIENT] Created client socket\n");
     
     network->client.si_other.sin_family = AF_INET;
     network->client.si_other.sin_port = htons(port);
-    network->client.si_other.sin_addr.S_un.S_addr = inet_addr(ip);
+    #ifdef _WIN32
+        network->client.si_other.sin_addr.S_un.S_addr = inet_addr(ip);
+    #else
+        network->client.si_other.sin_addr.s_addr = inet_addr(ip);
+    #endif
     
     int nmode = 1;
     if (ioctlsocket(network->client.socket, FIONBIO, &nmode) == SOCKET_ERROR) {
