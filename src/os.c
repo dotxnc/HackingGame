@@ -1,5 +1,9 @@
 #include "os.h"
 
+static Shader terminal_shader;
+static RenderTexture2D terminal_buffer;
+static float terminal_time;
+
 void initOS(OS_t* os)
 {
     // local_os = (OS_t*)malloc(sizeof(OS_t));
@@ -21,11 +25,15 @@ void initOS(OS_t* os)
     memset(local_os.username,'\0',MAX_USERNAME);
     for (int i = 0; i < MAX_LINES; i++)
         memset(local_os.chatlog[i], '\0', MAX_INPUT);
+    
+    terminal_buffer = LoadRenderTexture(screen_w*screen_w_gl, screen_h*screen_h_gl);
+    terminal_shader = LoadShader("assets/standard.glsl", "assets/terminal.glsl");
 }
 
 void freeOS(OS_t* os)
 {
     // free(local_os);
+    UnloadShader(terminal_shader);
 }
 
 bool commandOS(OS_t* os, char* command)
@@ -100,6 +108,8 @@ bool commandOS(OS_t* os, char* command)
 void updateOS(OS_t* os)
 {
     os->ostime += GetFrameTime()*2;
+    terminal_time += GetFrameTime()*10;
+    SetShaderValue(terminal_shader, GetShaderLocation(terminal_shader, "time"), &terminal_time, 1);
     
     if (!os->grabbed) {
         if (IsKeyPressed(KEY_E)) {
@@ -207,8 +217,8 @@ void pushlineOS(OS_t* os, const char* line)
 
 void drawOS(OS_t* os, Screen_t* scr)
 {
-    BeginTextureMode(scr->texture);
-    DrawRectangle(0, 0, scr->texture.texture.width*screen_w_gl, scr->texture.texture.height*screen_h_gl, BLACK);
+    BeginTextureMode(terminal_buffer);
+    DrawRectangle(0, 0, scr->texture.texture.width*screen_w_gl, scr->texture.texture.height*screen_h_gl, DARKGRAY);
     // TODO: draw
     switch (os->program)
     {
@@ -230,6 +240,13 @@ void drawOS(OS_t* os, Screen_t* scr)
         default:
             break;
     }
+    EndTextureMode();
+    
+    BeginTextureMode(scr->texture);
+    BeginShaderMode(terminal_shader);
+    DrawRectangle(0, 0, terminal_buffer.texture.width*screen_w_gl, terminal_buffer.texture.height*screen_h_gl, DARKGRAY);
+    DrawTextureRec(terminal_buffer.texture, (Rectangle){0, 0, terminal_buffer.texture.width*screen_w_gl, -terminal_buffer.texture.height*screen_h_gl}, (Vector2){0, 0}, WHITE);
+    EndShaderMode();
     EndTextureMode();
 }
 
@@ -275,12 +292,12 @@ void consoleUpdate(OS_t* os)
 void consoleDraw(OS_t* os)
 {
     for (int i = 0; i < MAX_LINES; i++) {
-        DrawText(os->lines[i], 5, 5+i*22, 20, GREEN);
+        DrawText(os->lines[i], 5, 5+i*22, 20, WHITE);
     }
     int iw = MeasureText(FormatText(">%s", os->input), 20);
-    DrawText(FormatText(">%s", os->input), 5, 5+os->line_length*22, 20, GREEN);
+    DrawText(FormatText(">%s", os->input), 5, 5+os->line_length*22, 20, WHITE);
     if ((int)os->ostime%2==1) {
-        DrawRectangle(5+iw+1, 5+os->line_length*22, 10, 20, GREEN);
+        DrawRectangle(5+iw+1, 5+os->line_length*22, 10, 20, WHITE);
     }
 }
 
@@ -337,7 +354,7 @@ void bootDraw(OS_t* os)
         os->bootline_timeout = 0;
     }
     for (int i = 0; i < MAX_LINES; i++) {
-        DrawText(os->lines[i], 5, 5+i*22, 20, GREEN);
+        DrawText(os->lines[i], 5, 5+i*22, 20, WHITE);
     }
     if (os->bootline == MAX_READOUTS && os->bootline_timeout>1) {
         if (strlen(os->username) == 0) {
@@ -394,13 +411,13 @@ void loginDraw(OS_t* os)
 {
     int w = MeasureText("ENTER USERNAME: ", 20);
     int iw = MeasureText(FormatText("%s", os->username), 20);
-    DrawText("ENTER USERNAME: ", 5, screen_h/2-100, 20, GREEN);
-    DrawText(FormatText("%-16s", os->username), 10+w, screen_h/2-100, 20, GREEN);
-    DrawLineEx((Vector2){10+w, screen_h/2-81}, (Vector2){10+w*2, screen_h/2-81}, 3, GREEN);
-    // DrawLine(10+w, screen_h/2+12, 10+w*2, screen_h/2+12, GREEN);
-    // DrawLine(10+w, screen_h/2+13, 10+w*2, screen_h/2+13, GREEN);
+    DrawText("ENTER USERNAME: ", 5, screen_h/2-100, 20, WHITE);
+    DrawText(FormatText("%-16s", os->username), 10+w, screen_h/2-100, 20, WHITE);
+    DrawLineEx((Vector2){10+w, screen_h/2-81}, (Vector2){10+w*2, screen_h/2-81}, 3, WHITE);
+    // DrawLine(10+w, screen_h/2+12, 10+w*2, screen_h/2+12, WHITE);
+    // DrawLine(10+w, screen_h/2+13, 10+w*2, screen_h/2+13, WHITE);
     if ((int)os->ostime%2==1) {
-        DrawRectangle(10+w+iw+1, screen_h/2-100, 10, 20, GREEN);
+        DrawRectangle(10+w+iw+1, screen_h/2-100, 10, 20, WHITE);
     }
 }
 

@@ -74,7 +74,7 @@ void drawScreen(Screen_t* screen)
     Vector3 vpos  = {0.f, 0.f, 0.f};
     vpos = Vector3Add(vpos, screen->pos);
     vpos = Vector3Add(vpos, screen_offset);
-    vpos = Vector3Add(vpos, (Vector3){0.f, 0.885f, -0.06f});
+    vpos = Vector3Add(vpos, (Vector3){0.f, 0.885f, -0.07f});
     screen_viewer.material.maps[MAP_DIFFUSE].texture = screen->texture.texture;
     DrawModel(screen_viewer, vpos, 1.f, WHITE);
 }

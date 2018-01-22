@@ -10,7 +10,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd Monitor_01.png
+map_Kd C:\Users\patri\Desktop\Projects\3dHacking\bin\assets\game\Monitor_01.png
 
 newmtl Material.002
 Ns 96.078431
@@ -21,7 +21,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd Monitor_01.png
+map_Kd C:\Users\patri\Desktop\Projects\3dHacking\bin\assets\game\Monitor_01.png
 
 newmtl Material.003
 Ns 96.078431
@@ -32,4 +32,4 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd Monitor_01.png
+map_Kd C:\Users\patri\Desktop\Projects\3dHacking\bin\assets\game\Monitor_01.png
