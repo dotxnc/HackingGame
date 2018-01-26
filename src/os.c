@@ -28,7 +28,7 @@ void initOS(OS_t* os)
         memset(local_os.chatlog[i], '\0', MAX_INPUT);
     
     terminal_buffer = LoadRenderTexture(screen_w*screen_w_gl, screen_h*screen_h_gl);
-    terminal_shader = LoadShader("assets/standard.glsl", "assets/terminal.glsl");
+    terminal_shader = LoadShader("assets/shaders/standard.vs", "assets/shaders/terminal.fs");
     terminal_time_pos = GetShaderLocation(terminal_shader, "time");
 }
 

@@ -40,13 +40,13 @@ int main(int argc, char** argv)
     
     screenspace = LoadRenderTexture(640, 480);
     
-    Shader shader = LoadShader("assets/base.glsl", "assets/lighting.glsl");
+    Shader shader = LoadShader("assets/shaders/base.vs", "assets/shaders/lighting.fs");
     shader.locs[LOC_MATRIX_MODEL] = GetShaderLocation(shader, "modelMatrix");
     loadScreenModels(shader);
     
-    dither = LoadShader("assets/standard.glsl", "assets/dither.glsl");
-    depth = LoadShader("assets/standard.glsl", "assets/depth.glsl");
-    posterize = LoadShader("assets/standard.glsl", "assets/posterize.glsl");
+    dither = LoadShader("assets/shaders/standard.vs", "assets/shaders/dither.fs");
+    depth = LoadShader("assets/shaders/standard.vs", "assets/shaders/depth.fs");
+    posterize = LoadShader("assets/shaders/standard.vs", "assets/shaders/posterize.fs");
     
     local_screen.pos.x = -20+rand()%40;
     local_screen.pos.z = -20+rand()%40;
@@ -55,8 +55,8 @@ int main(int argc, char** argv)
     ppos.x = camera.position.x;
     ppos.z = camera.position.z;
     
-    Model tower = LoadModel("assets/game/Tower.obj");
-    tower.material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/game/Tower.png");
+    Model tower = LoadModel("assets/models/Tower.obj");
+    tower.material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/models/Tower.png");
     tower.material.shader = shader;
     
     SetCameraMode(camera, CAMERA_FIRST_PERSON);

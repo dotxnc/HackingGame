@@ -13,20 +13,20 @@ static Vector3 screen_offset;
 
 void loadScreenModels(Shader lighting)
 {
-    screen_desk = LoadModel("assets/game/Desk_02.obj");
-    screen_monitor = LoadModel("assets/game/Monitor_01.obj");
-    screen_keyboard = LoadModel("assets/game/Keyboard.obj");
-    screen_mouse = LoadModel("assets/game/Mouse.obj");
-    screen_player = LoadModel("assets/game/Player.obj");
+    screen_desk = LoadModel("assets/models/Desk_02.obj");
+    screen_monitor = LoadModel("assets/models/Monitor_01.obj");
+    screen_keyboard = LoadModel("assets/models/Keyboard.obj");
+    screen_mouse = LoadModel("assets/models/Mouse.obj");
+    screen_player = LoadModel("assets/models/Player.obj");
     
     screen_mesh = GenMeshPlane(screen_w_gl, screen_h_gl, 256, 256);
     screen_viewer = LoadModelFromMesh(screen_mesh);
     
-    screen_desk.material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/game/Desk_02.png");
-    screen_monitor.material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/game/Monitor_01.png");
-    screen_keyboard.material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/game/Keyboard.png");
-    screen_mouse.material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/game/Mouse.png");
-    screen_player.material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/game/Player.png");
+    screen_desk.material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/models/Desk_02.png");
+    screen_monitor.material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/models/Monitor_01.png");
+    screen_keyboard.material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/models/Keyboard.png");
+    screen_mouse.material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/models/Mouse.png");
+    screen_player.material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/models/Player.png");
     
     screen_desk.material.shader = lighting;
     screen_monitor.material.shader = lighting;
