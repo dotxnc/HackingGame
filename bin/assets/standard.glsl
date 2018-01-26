@@ -14,6 +14,7 @@ uniform mat4 modelMatrix;
 out vec2 fragTexCoord;
 out vec4 fragColor;
 out vec3 fragNormal;
+out vec2 fragUV;
 
 // NOTE: Add here your custom variables 
 
@@ -22,6 +23,8 @@ void main()
     // Send vertex attributes to fragment shader
     fragTexCoord = vertexTexCoord;
     fragColor = vertexColor;
+    fragUV = (vertexTexCoord + vec2(1.0)) / 2.0;
+    fragUV.y = 1.0 - fragUV.y;
     
     mat3 normalMatrix = transpose(inverse(mat3(modelMatrix)));
     fragNormal = normalize(normalMatrix*vertexNormal);

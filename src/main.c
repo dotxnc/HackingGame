@@ -17,6 +17,9 @@ Vector3 monitor_pos;
 float post = 0.f;
 PlayerPositionPacket_t ppos;
 
+RenderTexture2D screenspace;
+Shader dither;
+
 void updatePlayerScreen(Screen_t*);
 
 int main(int argc, char** argv)
@@ -31,15 +34,16 @@ int main(int argc, char** argv)
     
     initOS(NULL);
     
+    screenspace = LoadRenderTexture(640, 480);
+    
     Shader shader = LoadShader("assets/base.glsl", "assets/lighting.glsl");
     shader.locs[LOC_MATRIX_MODEL] = GetShaderLocation(shader, "modelMatrix");
     loadScreenModels(shader);
     
+    dither = LoadShader("assets/standard.glsl", "assets/dither.glsl");
+    
     local_screen.pos.x = -20+rand()%40;
     local_screen.pos.z = -20+rand()%40;
-    
-    int WIDTH = screen_w * screen_w_gl;
-    int HEIGHT = screen_h * screen_h_gl;
     
     Camera camera = {{ local_screen.pos.x+3.0f, 3.65f, local_screen.pos.z+3.0f }, { 0.0f, 1.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, 90.0f };
     ppos.x = camera.position.x;
@@ -83,15 +87,21 @@ int main(int argc, char** argv)
         
         
         BeginDrawing();
-            
             ClearBackground((Color){0, 0, 0, 10});
-            updatePlayerScreen(&local_screen);
             
-            Begin3dMode(camera);
-                drawPlayers();
-                DrawModel(tower, (Vector3){0, 0, -20}, 1.f, WHITE);
-                drawScreen(&local_screen);
-            End3dMode();
+            BeginTextureMode(screenspace);
+                updatePlayerScreen(&local_screen);
+                
+                Begin3dMode(camera);
+                    drawPlayers();
+                    DrawModel(tower, (Vector3){0, 0, -20}, 1.f, WHITE);
+                    drawScreen(&local_screen);
+                End3dMode();
+            EndTextureMode();
+            
+            BeginShaderMode(dither);
+                DrawTextureRec(screenspace.texture, (Rectangle){0, 0, 640, -480}, (Vector2){0, 0}, WHITE);
+            EndShaderMode();
             
             DrawText(local_os.grabbed ? "GRABBED" : "NOT GRABBED", 10, 10, 20, WHITE);
             
