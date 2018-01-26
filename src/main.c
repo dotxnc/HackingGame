@@ -19,6 +19,10 @@ PlayerPositionPacket_t ppos;
 
 RenderTexture2D screenspace;
 Shader dither;
+Shader depth;
+Shader posterize;
+
+bool D = false;
 
 void updatePlayerScreen(Screen_t*);
 
@@ -41,6 +45,8 @@ int main(int argc, char** argv)
     loadScreenModels(shader);
     
     dither = LoadShader("assets/standard.glsl", "assets/dither.glsl");
+    depth = LoadShader("assets/standard.glsl", "assets/depth.glsl");
+    posterize = LoadShader("assets/standard.glsl", "assets/posterize.glsl");
     
     local_screen.pos.x = -20+rand()%40;
     local_screen.pos.z = -20+rand()%40;
@@ -83,15 +89,18 @@ int main(int argc, char** argv)
             }
             UpdateCamera(&camera);
         }
-        // printf("IS IT FUCKING GRABBED? %s\n", local_os->grabbed ? "fucking yes" : "lol fuck off");
+        
+        if (IsKeyPressed(KEY_F1)) {
+            D = !D;
+        }
         
         
         BeginDrawing();
-            ClearBackground((Color){0, 0, 0, 10});
+            // ClearBackground(BLACK);
+            updatePlayerScreen(&local_screen);
             
             BeginTextureMode(screenspace);
-                updatePlayerScreen(&local_screen);
-                
+                ClearBackground(BLACK);
                 Begin3dMode(camera);
                     drawPlayers();
                     DrawModel(tower, (Vector3){0, 0, -20}, 1.f, WHITE);
@@ -99,13 +108,18 @@ int main(int argc, char** argv)
                 End3dMode();
             EndTextureMode();
             
-            BeginShaderMode(dither);
+            BeginShaderMode(posterize);
                 DrawTextureRec(screenspace.texture, (Rectangle){0, 0, 640, -480}, (Vector2){0, 0}, WHITE);
             EndShaderMode();
             
-            DrawText(local_os.grabbed ? "GRABBED" : "NOT GRABBED", 10, 10, 20, WHITE);
-            
-            //drawPlayerList();
+            if (D) {
+                BeginShaderMode(depth);
+                    Rectangle sourceRec = {0, 0, 640, -480};
+                    Rectangle destRec = { 0, 0, sourceRec.width*0.5, abs(sourceRec.height*0.5) };
+                    Vector2 origin = { 0, 0 };
+                    DrawTexturePro(screenspace.depth, sourceRec, destRec, origin, 0.0f, WHITE);
+                EndShaderMode();
+            }
         
         EndDrawing();
         
@@ -115,6 +129,10 @@ int main(int argc, char** argv)
     freeOS(NULL);
     freeScreenModels();
     UnloadModel(tower);
+    UnloadRenderTexture(screenspace);
+    UnloadShader(dither);
+    UnloadShader(depth);
+    UnloadShader(posterize);
     
     CloseWindow();
     

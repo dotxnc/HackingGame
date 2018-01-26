@@ -3,6 +3,7 @@
 static Shader terminal_shader;
 static RenderTexture2D terminal_buffer;
 static float terminal_time;
+static int terminal_time_pos;
 
 void initOS(OS_t* os)
 {
@@ -28,6 +29,7 @@ void initOS(OS_t* os)
     
     terminal_buffer = LoadRenderTexture(screen_w*screen_w_gl, screen_h*screen_h_gl);
     terminal_shader = LoadShader("assets/standard.glsl", "assets/terminal.glsl");
+    terminal_time_pos = GetShaderLocation(terminal_shader, "time");
 }
 
 void freeOS(OS_t* os)
@@ -109,7 +111,7 @@ void updateOS(OS_t* os)
 {
     os->ostime += GetFrameTime()*2;
     terminal_time += GetFrameTime()*10;
-    SetShaderValue(terminal_shader, GetShaderLocation(terminal_shader, "time"), &terminal_time, 1);
+    SetShaderValue(terminal_shader, terminal_time_pos, &terminal_time, 1);
     
     if (!os->grabbed) {
         if (IsKeyPressed(KEY_E)) {
@@ -218,35 +220,35 @@ void pushlineOS(OS_t* os, const char* line)
 void drawOS(OS_t* os, Screen_t* scr)
 {
     BeginTextureMode(terminal_buffer);
-    DrawRectangle(0, 0, scr->texture.texture.width*screen_w_gl, scr->texture.texture.height*screen_h_gl, DARKGRAY);
-    // TODO: draw
-    switch (os->program)
-    {
-        case CONSOLE:
-            consoleDraw(os);
-            break;
-        case CHAT:
-            chatDraw(os);
-            break;
-        case LOGIN:
-            loginDraw(os);
-            break;
-        case OFFLINE:
-            offlineDraw(os);
-            break;
-        case BOOT:
-            bootDraw(os);
-            break;
-        default:
-            break;
-    }
+        DrawRectangle(0, 0, scr->texture.texture.width*screen_w_gl, scr->texture.texture.height*screen_h_gl, DARKGRAY);
+        // TODO: draw
+        switch (os->program)
+        {
+            case CONSOLE:
+                consoleDraw(os);
+                break;
+            case CHAT:
+                chatDraw(os);
+                break;
+            case LOGIN:
+                loginDraw(os);
+                break;
+            case OFFLINE:
+                offlineDraw(os);
+                break;
+            case BOOT:
+                bootDraw(os);
+                break;
+            default:
+                break;
+        }
     EndTextureMode();
-    
+        
     BeginTextureMode(scr->texture);
-    BeginShaderMode(terminal_shader);
-    DrawRectangle(0, 0, terminal_buffer.texture.width*screen_w_gl, terminal_buffer.texture.height*screen_h_gl, DARKGRAY);
-    DrawTextureRec(terminal_buffer.texture, (Rectangle){0, 0, terminal_buffer.texture.width*screen_w_gl, -terminal_buffer.texture.height*screen_h_gl}, (Vector2){0, 0}, WHITE);
-    EndShaderMode();
+        BeginShaderMode(terminal_shader);
+            DrawRectangle(0, 0, terminal_buffer.texture.width*screen_w_gl, terminal_buffer.texture.height*screen_h_gl, DARKGRAY);
+            DrawTextureRec(terminal_buffer.texture, (Rectangle){0, 0, terminal_buffer.texture.width*screen_w_gl, -terminal_buffer.texture.height*screen_h_gl}, (Vector2){0, 0}, WHITE);
+        EndShaderMode();
     EndTextureMode();
 }
 

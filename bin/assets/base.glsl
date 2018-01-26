@@ -9,6 +9,7 @@ in vec4 vertexColor;
 // Input uniform values
 uniform mat4 mvp;
 uniform mat4 modelMatrix;
+// uniform vec3 vertexNormal;
 
 // Output vertex attributes (to fragment shader)
 out vec2 fragTexCoord;
