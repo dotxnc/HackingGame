@@ -34,7 +34,6 @@ void loadScreenModels(Shader lighting)
     screen_mouse.material.shader = lighting;
     screen_player.material.shader = lighting;
     
-    local_screen.pos = (Vector3){0,0,0};
     local_screen.in_use = false;
     local_screen.texture = LoadRenderTexture(screen_w*screen_w_gl, screen_h*screen_h_gl);
     

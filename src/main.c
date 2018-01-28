@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include <raylib.h>
 #include <raymath.h>
@@ -14,11 +15,10 @@
 #include "os.h"
 #include "viewmodel.h"
 
-Vector3 monitor_pos;
-
 float post = 0.f;
 PlayerPositionPacket_t ppos;
 bool D = false;
+bool MLOCK = true;
 
 RenderTexture2D screenspace;
 Shader dither;
@@ -31,13 +31,16 @@ void drawDebugText();
 
 int main(int argc, char** argv)
 {
+    // seed random
+    srand(time(NULL));
+    
     // init window
     InitWindow(640, 480, "Hack");
     SetExitKey(KEY_F12);
     SetTargetFPS(60);
     
     // init variables
-    camera = (Camera){{ local_screen.pos.x+3.0f, 3.65f, local_screen.pos.z+3.0f }, { 0.0f, 1.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, 90.0f };
+    camera = (Camera){{ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, 90.0f };
     Shader shader = LoadShader("assets/shaders/base.vs", "assets/shaders/lighting.fs");
     dither        = LoadShader("assets/shaders/standard.vs", "assets/shaders/dither.fs");
     depth         = LoadShader("assets/shaders/standard.vs", "assets/shaders/depth.fs");
@@ -46,7 +49,6 @@ int main(int argc, char** argv)
     Model tower = LoadModel("assets/models/Tower.obj");
     
     // set defaults
-    monitor_pos = (Vector3){0.3, 2.6, 1.25};
     tower.material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/models/Tower.png");
     tower.material.shader = shader;
     shader.locs[LOC_MATRIX_MODEL] = GetShaderLocation(shader, "modelMatrix");
@@ -54,6 +56,7 @@ int main(int argc, char** argv)
     local_screen.pos.z = -20+rand()%40;
     ppos.x = camera.position.x;
     ppos.z = camera.position.z;
+    camera.position = (Vector3){local_screen.pos.x+3.0f, 3.65f, local_screen.pos.z+3.0f};
     
     // init components
     initNetwork();
@@ -82,7 +85,7 @@ int main(int argc, char** argv)
         updateServerNetwork();
         
         updateOS(&local_os);
-        if (!local_os.grabbed) {
+        if (!local_os.grabbed && MLOCK) {
             if (IsKeyDown(KEY_LEFT_SHIFT)) {
                 PLAYER_MOVEMENT_SENSITIVITY = 15.f;
             } else {
@@ -94,6 +97,14 @@ int main(int argc, char** argv)
         if (IsKeyPressed(KEY_F1)) {
             D = !D;
         }
+        if (IsKeyPressed(KEY_F2)) {
+            MLOCK = !MLOCK;
+        }
+        
+        if (MLOCK)
+            DisableCursor();
+        else
+            EnableCursor();
         
         
         BeginDrawing();
