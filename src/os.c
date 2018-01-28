@@ -209,12 +209,12 @@ void pushlineOS(OS_t* os, const char* line)
     }
     if (os->line_length == MAX_LINES) {
         for (int i = 0; i < MAX_LINES-1; i++) {
-            memcpy(os->lines[i], os->lines[i+1], strlen(os->lines[i+1]));
+            strcpy(os->lines[i], os->lines[i+1]);
         }
     } else {
         os->line_length++;
     }
-    memcpy(os->lines[os->line_length-1], line, strlen(line));
+    strcpy(os->lines[os->line_length-1], line);
 }
 
 void drawOS(OS_t* os, Screen_t* scr)

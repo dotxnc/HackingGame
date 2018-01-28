@@ -12,7 +12,7 @@
 #include "network.h"
 
 #define MAX_INPUT 45
-#define MAX_LINES 23
+#define MAX_LINES 22
 #define MAX_ARGS 5
 #define MAX_USERNAME 16
 #define MAX_READOUTS 10

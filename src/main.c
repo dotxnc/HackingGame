@@ -12,6 +12,7 @@
 #include "network.h"
 #include "screen.h"
 #include "os.h"
+#include "viewmodel.h"
 
 Vector3 monitor_pos;
 float post = 0.f;
@@ -44,6 +45,8 @@ int main(int argc, char** argv)
     shader.locs[LOC_MATRIX_MODEL] = GetShaderLocation(shader, "modelMatrix");
     loadScreenModels(shader);
     
+    initViewmodel("assets/models/Hand.obj", shader);
+    
     dither = LoadShader("assets/shaders/standard.vs", "assets/shaders/dither.fs");
     depth = LoadShader("assets/shaders/standard.vs", "assets/shaders/depth.fs");
     posterize = LoadShader("assets/shaders/standard.vs", "assets/shaders/posterize.fs");
@@ -65,11 +68,11 @@ int main(int argc, char** argv)
     
     while (!WindowShouldClose())
     {
-        if (network->client_running) {
+        if (network.client_running) {
             post += GetFrameTime();
             if (post > 1.f/30.f) {
                 post = 0.f;
-                ppos.uid = network->client.uid;
+                ppos.uid = network.client.uid;
                 ppos.x = camera.position.x;
                 ppos.z = camera.position.z;
                 ppos.rot = cameraAngle.x+PI;
@@ -96,11 +99,12 @@ int main(int argc, char** argv)
         
         
         BeginDrawing();
-            // ClearBackground(BLACK);
+            ClearBackground(BLACK);
             updatePlayerScreen(&local_screen);
             
+            renderViewmodel();
+            
             BeginTextureMode(screenspace);
-                ClearBackground(BLACK);
                 Begin3dMode(camera);
                     drawPlayers();
                     DrawModel(tower, (Vector3){0, 0, -20}, 1.f, WHITE);
@@ -111,6 +115,7 @@ int main(int argc, char** argv)
             BeginShaderMode(posterize);
                 DrawTextureRec(screenspace.texture, (Rectangle){0, 0, 640, -480}, (Vector2){0, 0}, WHITE);
             EndShaderMode();
+            drawViewmodel();
             
             if (D) {
                 BeginShaderMode(depth);
@@ -128,6 +133,7 @@ int main(int argc, char** argv)
     freeNetwork();
     freeOS(NULL);
     freeScreenModels();
+    freeViewmodel();
     UnloadModel(tower);
     UnloadRenderTexture(screenspace);
     UnloadShader(dither);
