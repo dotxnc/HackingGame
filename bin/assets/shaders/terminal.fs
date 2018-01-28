@@ -43,10 +43,14 @@ vec3 channelSplit(sampler2D tex, vec2 coord){
 vec4 crt()
 {
     vec4 c = vec4(1.0);
+    // crt, scanlines
     vec2 fisheyeUV = fisheye(fragTexCoord, 0.03);
     c.rgb = channelSplit(texture0, fisheyeUV);
     vec2 screenSpace = fisheyeUV * screensize;
     c.rgb = scanline(screenSpace, c.rgb) * vec3(0.5, 1.0, 0.5);
+    // vignette
+    float vignette = smoothstep(0.75, 0.75-0.45, length(fragTexCoord-0.5));
+    c.rgb = mix(c.rgb, c.rgb*vignette, 0.5);
     return c;
 }
 
