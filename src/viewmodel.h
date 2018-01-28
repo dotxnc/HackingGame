@@ -5,6 +5,8 @@
 #include <raymath.h>
 #include <math.h>
 
+#include "os.h"
+
 typedef struct Viewmodel_t {
     Camera camera;
     Model model;

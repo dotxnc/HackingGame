@@ -23,16 +23,21 @@ static float d = 0.f;
 
 void renderViewmodel()
 {
-    d += GetFrameTime();
+    float mod = 1.f;
+    if (IsKeyDown(KEY_LEFT_SHIFT) && !local_os.grabbed && IsKeyDown(KEY_W)) {
+        mod = 5.f;
+    }
+    d += GetFrameTime()*mod;
     BeginTextureMode(viewmodel.target);
         ClearBackground((Color){0, 0, 0, 0});
         Begin3dMode(viewmodel.camera);
+            
             Matrix m = MatrixIdentity();
             m = MatrixMultiply(m, MatrixRotateX(90*DEG2RAD));
             m = MatrixMultiply(m, MatrixRotateY(-0.8+(sin(d)*-14)*DEG2RAD));
             viewmodel.model.transform = m;
             
-            DrawModel(viewmodel.model, (Vector3){0.7, -1, 0.8}, 1.f, WHITE);
+            DrawModel(viewmodel.model, (Vector3){0.7, -1, 0.8+sin(d)*0.05}, 1.f, WHITE);
         End3dMode();
     EndTextureMode();
 }

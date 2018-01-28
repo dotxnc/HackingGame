@@ -27,6 +27,7 @@ Shader posterize;
 
 
 void updatePlayerScreen(Screen_t*);
+void drawDebugText();
 
 int main(int argc, char** argv)
 {
@@ -121,7 +122,9 @@ int main(int argc, char** argv)
                     Vector2 origin = { 0, 0 };
                     DrawTexturePro(screenspace.depth, sourceRec, destRec, origin, 0.0f, WHITE);
                 EndShaderMode();
+                drawDebugText();
             }
+            
         
         EndDrawing();
         
@@ -145,4 +148,10 @@ int main(int argc, char** argv)
 void updatePlayerScreen(Screen_t* scr)
 {
     drawOS(&local_os, scr);
+}
+
+void drawDebugText()
+{
+    static int yoff = (int)(480/2)+10;
+    DrawText(FormatText("FPS: %d", GetFPS()), 10, yoff, 20, RAYWHITE);
 }
