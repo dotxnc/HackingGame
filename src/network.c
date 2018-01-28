@@ -2,7 +2,6 @@
 
 bool initNetwork()
 {
-    // network = (Network_t*)malloc(sizeof(Network_t));
     network.server_running = false;
     network.client_running = false;
     
@@ -105,7 +104,6 @@ bool startClientNetwork(const char* ip, int port)
     network.client_running = true;
     
     ClientConnectPacket_t* conn_packet = (ClientConnectPacket_t*)malloc(sizeof(conn_packet));
-    // conn_packet->buffer = -1;
     conn_packet->x = local_screen.pos.x;
     conn_packet->z = local_screen.pos.z;
     sendDataClient(conn_packet, sizeof(ClientConnectPacket_t), PACKET_CONNECT);
@@ -117,7 +115,6 @@ bool startClientNetwork(const char* ip, int port)
 void updateServerNetwork()
 {
     if (!network.server_running) return;
-    // printf("updating server\n");
     
     if ((network.server.recv_len = recvfrom(network.server.socket, network.server.buffer, 512, 0, &network.server.si_other, &network.server.slen)) != SOCKET_ERROR) {
         int packet_type = network.server.buffer[network.server.recv_len-1];

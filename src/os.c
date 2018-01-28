@@ -4,11 +4,10 @@ static Shader terminal_shader;
 static RenderTexture2D terminal_buffer;
 static float terminal_time;
 static int terminal_time_pos;
+static int terminal_screensize_pos;
 
 void initOS(OS_t* os)
 {
-    // local_os = (OS_t*)malloc(sizeof(OS_t));
-    
     local_os.input_length = 0;
     local_os.line_length = 0;
     local_os.grabbed = false;
@@ -30,11 +29,15 @@ void initOS(OS_t* os)
     terminal_buffer = LoadRenderTexture(screen_w*screen_w_gl, screen_h*screen_h_gl);
     terminal_shader = LoadShader("assets/shaders/standard.vs", "assets/shaders/terminal.fs");
     terminal_time_pos = GetShaderLocation(terminal_shader, "time");
+    terminal_screensize_pos = GetShaderLocation(terminal_shader, "screensize");
+    
+    int screensize[2] = {screen_w*screen_w_gl, screen_h*screen_h_gl};
+    SetShaderValuei(terminal_shader, terminal_screensize_pos, screensize, 2);
+    
 }
 
 void freeOS(OS_t* os)
 {
-    // free(local_os);
     UnloadShader(terminal_shader);
 }
 
@@ -86,7 +89,6 @@ bool commandOS(OS_t* os, char* command)
     }
     else if (!strcmp(args[0], "test")) {
         for (int i = 0; i < 20; i++) {
-            // pushlineOS(os, "test line");
             pushlineOS(os, FormatText("test line %d", i));
         }
         return true;
@@ -110,7 +112,7 @@ bool commandOS(OS_t* os, char* command)
 void updateOS(OS_t* os)
 {
     os->ostime += GetFrameTime()*2;
-    terminal_time += GetFrameTime()*10;
+    terminal_time += GetFrameTime();
     SetShaderValue(terminal_shader, terminal_time_pos, &terminal_time, 1);
     
     if (!os->grabbed) {
@@ -152,7 +154,6 @@ void updateOS(OS_t* os)
         return;
     }
     
-    // TODO: update
     switch (os->program)
     {
         case CONSOLE:
@@ -221,7 +222,6 @@ void drawOS(OS_t* os, Screen_t* scr)
 {
     BeginTextureMode(terminal_buffer);
         DrawRectangle(0, 0, scr->texture.texture.width*screen_w_gl, scr->texture.texture.height*screen_h_gl, DARKGRAY);
-        // TODO: draw
         switch (os->program)
         {
             case CONSOLE:
@@ -391,14 +391,8 @@ void loginUpdate(OS_t* os)
     } else if (IsKeyPressed(KEY_BACKSPACE)) {
         if (os->username_length > 0) {
             os->username[os->username_length-1] = '\0';
-            // os->username[os->username_length] = '\0';
             os->username_length--;
         }
-    } else if (k == 32) {
-        // if (os->username_length < MAX_USERNAME) {
-        //     os->username[os->username_length] = ' ';
-        //     os->username_length++;
-        // }
     } else if (IsKeyPressed(KEY_ENTER)) {
         flashOS(os,NULL,0);
         pushlineOS(os, FormatText("Welcome to your terminal, %s.", os->username));
@@ -416,8 +410,6 @@ void loginDraw(OS_t* os)
     DrawText("ENTER USERNAME: ", 5, screen_h/2-100, 20, WHITE);
     DrawText(FormatText("%-16s", os->username), 10+w, screen_h/2-100, 20, WHITE);
     DrawLineEx((Vector2){10+w, screen_h/2-81}, (Vector2){10+w*2, screen_h/2-81}, 3, WHITE);
-    // DrawLine(10+w, screen_h/2+12, 10+w*2, screen_h/2+12, WHITE);
-    // DrawLine(10+w, screen_h/2+13, 10+w*2, screen_h/2+13, WHITE);
     if ((int)os->ostime%2==1) {
         DrawRectangle(10+w+iw+1, screen_h/2-100, 10, 20, WHITE);
     }

@@ -33,14 +33,11 @@ void loadScreenModels(Shader lighting)
     screen_keyboard.material.shader = lighting;
     screen_mouse.material.shader = lighting;
     screen_player.material.shader = lighting;
-    // screen_viewer.material.shader = lighting;
     
-    // local_screen = (Screen_t*)malloc(sizeof(local_screen));
     local_screen.pos = (Vector3){0,0,0};
     local_screen.in_use = false;
     local_screen.texture = LoadRenderTexture(screen_w*screen_w_gl, screen_h*screen_h_gl);
     
-    // screen_offset = {-0.4, 2.6, .5};
     screen_offset.x = -0.4f;
     screen_offset.y = 2.6f;
     screen_offset.z = 0.5f;
@@ -55,7 +52,6 @@ void freeScreenModels()
     UnloadModel(screen_mouse);
     UnloadModel(screen_player);
     UnloadRenderTexture(local_screen.texture);
-    // UnloadMesh(&screen_mesh);
 }
 
 void drawScreen(Screen_t* screen)
