@@ -24,7 +24,7 @@ RenderTexture2D screenspace;
 Shader dither;
 Shader depth;
 Shader posterize;
-
+Camera camera;
 
 void updatePlayerScreen(Screen_t*);
 void drawDebugText();
@@ -37,7 +37,7 @@ int main(int argc, char** argv)
     SetTargetFPS(60);
     
     // init variables
-    Camera camera = {{ local_screen.pos.x+3.0f, 3.65f, local_screen.pos.z+3.0f }, { 0.0f, 1.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, 90.0f };
+    camera = (Camera){{ local_screen.pos.x+3.0f, 3.65f, local_screen.pos.z+3.0f }, { 0.0f, 1.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, 90.0f };
     Shader shader = LoadShader("assets/shaders/base.vs", "assets/shaders/lighting.fs");
     dither        = LoadShader("assets/shaders/standard.vs", "assets/shaders/dither.fs");
     depth         = LoadShader("assets/shaders/standard.vs", "assets/shaders/depth.fs");
@@ -155,4 +155,5 @@ void drawDebugText()
     static int yoff = (int)(480/2)+10;
     DrawText(FormatText("FPS: %d", GetFPS()), 10, yoff, 20, RAYWHITE);
     DrawText(FormatText("POS: %2f %2f %2f", camera.position.x, camera.position.y, camera.position.z), 10, yoff+15, 20, RAYWHITE);
+    DrawText(FormatText("TAR: %2f %2f %2f", camera.target.x, camera.target.y, camera.target.z), 10, yoff+15+15, 20, RAYWHITE);
 }
