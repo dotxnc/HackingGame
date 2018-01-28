@@ -15,53 +15,50 @@
 #include "viewmodel.h"
 
 Vector3 monitor_pos;
+
 float post = 0.f;
 PlayerPositionPacket_t ppos;
+bool D = false;
 
 RenderTexture2D screenspace;
 Shader dither;
 Shader depth;
 Shader posterize;
 
-bool D = false;
 
 void updatePlayerScreen(Screen_t*);
 
 int main(int argc, char** argv)
 {
-    monitor_pos = (Vector3){0.3, 2.6, 1.25};
-    
-    initNetwork();
-    
+    // init window
     InitWindow(640, 480, "Hack");
     SetExitKey(KEY_F12);
     SetTargetFPS(60);
     
-    initOS(NULL);
-    
-    screenspace = LoadRenderTexture(640, 480);
-    
+    // init variables
+    Camera camera = {{ local_screen.pos.x+3.0f, 3.65f, local_screen.pos.z+3.0f }, { 0.0f, 1.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, 90.0f };
     Shader shader = LoadShader("assets/shaders/base.vs", "assets/shaders/lighting.fs");
+    dither        = LoadShader("assets/shaders/standard.vs", "assets/shaders/dither.fs");
+    depth         = LoadShader("assets/shaders/standard.vs", "assets/shaders/depth.fs");
+    posterize     = LoadShader("assets/shaders/standard.vs", "assets/shaders/posterize.fs");
+    screenspace = LoadRenderTexture(640, 480);
+    Model tower = LoadModel("assets/models/Tower.obj");
+    
+    // set defaults
+    monitor_pos = (Vector3){0.3, 2.6, 1.25};
+    tower.material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/models/Tower.png");
+    tower.material.shader = shader;
     shader.locs[LOC_MATRIX_MODEL] = GetShaderLocation(shader, "modelMatrix");
-    loadScreenModels(shader);
-    
-    initViewmodel("assets/models/Hand.obj", shader);
-    
-    dither = LoadShader("assets/shaders/standard.vs", "assets/shaders/dither.fs");
-    depth = LoadShader("assets/shaders/standard.vs", "assets/shaders/depth.fs");
-    posterize = LoadShader("assets/shaders/standard.vs", "assets/shaders/posterize.fs");
-    
     local_screen.pos.x = -20+rand()%40;
     local_screen.pos.z = -20+rand()%40;
-    
-    Camera camera = {{ local_screen.pos.x+3.0f, 3.65f, local_screen.pos.z+3.0f }, { 0.0f, 1.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, 90.0f };
     ppos.x = camera.position.x;
     ppos.z = camera.position.z;
     
-    Model tower = LoadModel("assets/models/Tower.obj");
-    tower.material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/models/Tower.png");
-    tower.material.shader = shader;
-    
+    // init components
+    initNetwork();
+    initOS(NULL);
+    loadScreenModels(shader);
+    initViewmodel("assets/models/Hand.obj", shader);
     SetCameraMode(camera, CAMERA_FIRST_PERSON);
     
     printf("[INFO] Initialized player at %fx %fz\n", local_screen.pos.x, local_screen.pos.z);
