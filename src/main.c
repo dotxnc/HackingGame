@@ -154,4 +154,5 @@ void drawDebugText()
 {
     static int yoff = (int)(480/2)+10;
     DrawText(FormatText("FPS: %d", GetFPS()), 10, yoff, 20, RAYWHITE);
+    DrawText(FormatText("POS: %2f %2f %2f", camera.position.x, camera.position.y, camera.position.z), 10, yoff+15, 20, RAYWHITE);
 }
