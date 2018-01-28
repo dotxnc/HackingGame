@@ -111,8 +111,8 @@ int main(int argc, char** argv)
             
             BeginShaderMode(posterize);
                 DrawTextureRec(screenspace.texture, (Rectangle){0, 0, 640, -480}, (Vector2){0, 0}, WHITE);
+                drawViewmodel();
             EndShaderMode();
-            drawViewmodel();
             
             if (D) {
                 BeginShaderMode(depth);
