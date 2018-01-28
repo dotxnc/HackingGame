@@ -20,7 +20,6 @@
     #undef PlaySound
     #define HACK_GETERROR() WSAGetLastError()
 #else
-    // TODO: include posix socket headers
     #include <sys/types.h>
     #include <sys/socket.h>
     #include <sys/ioctl.h>

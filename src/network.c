@@ -176,6 +176,15 @@ void updateServerNetwork()
                 }
                 free(packet);
             } break;
+            case PACKET_CHAT: {
+                ChatPacket_t* packet = (ChatPacket_t*)malloc(sizeof(ChatPacket_t));
+                memcpy(packet, network.server.buffer, network.server.recv_len-1);
+                printf("shit: %s\n", packet->chat);
+                for (int i = 0; i < network.server.num_clients; i++) {
+                    sendDataServer(packet, network.server.recv_len-1, PACKET_CHAT, network.server.clients[i].uid);
+                }
+                free(packet);
+            } break;
             default: {
                 printf("[NET][SERVER] Packet type not handled: %d\n", packet_type);
             } break;
@@ -226,6 +235,12 @@ void updateClientNetwork()
                         break;
                     }
                 }
+                free(packet);
+            } break;
+            case PACKET_CHAT: {
+                ChatPacket_t* packet = (ChatPacket_t*)malloc(sizeof(ChatPacket_t));
+                memcpy(packet, network.client.buffer, network.client.recv_len-1);
+                pushchatOS(&local_os, FormatText("%d: %s", packet->uid, packet->chat));
                 free(packet);
             } break;
             default: {

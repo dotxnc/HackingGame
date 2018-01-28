@@ -68,7 +68,9 @@ void freeOS(OS_t*);
 bool commandOS(OS_t*, char*);
 void updateOS(OS_t*);
 void flashOS(OS_t*, char[MAX_LINES][MAX_INPUT], int);
+void pushOS(OS_t*, const char*, bool);
 void pushlineOS(OS_t*, const char*);
+void pushchatOS(OS_t*, const char*);
 void drawOS(OS_t*, Screen_t*);
 
 /// Programs

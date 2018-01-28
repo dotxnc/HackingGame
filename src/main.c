@@ -21,7 +21,6 @@ bool D = false;
 bool MLOCK = true;
 
 RenderTexture2D screenspace;
-Shader dither;
 Shader depth;
 Shader posterize;
 Camera camera;
@@ -42,7 +41,6 @@ int main(int argc, char** argv)
     // init variables
     camera = (Camera){{ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, 90.0f };
     Shader shader = LoadShader("assets/shaders/base.vs", "assets/shaders/lighting.fs");
-    dither        = LoadShader("assets/shaders/standard.vs", "assets/shaders/dither.fs");
     depth         = LoadShader("assets/shaders/standard.vs", "assets/shaders/depth.fs");
     posterize     = LoadShader("assets/shaders/standard.vs", "assets/shaders/posterize.fs");
     screenspace = LoadRenderTexture(640, 480);
@@ -54,9 +52,9 @@ int main(int argc, char** argv)
     shader.locs[LOC_MATRIX_MODEL] = GetShaderLocation(shader, "modelMatrix");
     local_screen.pos.x = -20+rand()%40;
     local_screen.pos.z = -20+rand()%40;
+    camera.position = (Vector3){local_screen.pos.x+3.0f, 3.65f, local_screen.pos.z+3.0f};
     ppos.x = camera.position.x;
     ppos.z = camera.position.z;
-    camera.position = (Vector3){local_screen.pos.x+3.0f, 3.65f, local_screen.pos.z+3.0f};
     
     // init components
     initNetwork();
@@ -69,7 +67,7 @@ int main(int argc, char** argv)
     
     while (!WindowShouldClose())
     {
-        if (network.client_running) {
+        if (network.client_running) { // TODO: Change to network.client_connected
             post += GetFrameTime();
             if (post > 1.f/30.f) {
                 post = 0.f;
@@ -147,7 +145,6 @@ int main(int argc, char** argv)
     freeViewmodel();
     UnloadModel(tower);
     UnloadRenderTexture(screenspace);
-    UnloadShader(dither);
     UnloadShader(depth);
     UnloadShader(posterize);
     

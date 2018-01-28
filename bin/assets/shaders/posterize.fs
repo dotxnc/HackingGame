@@ -8,7 +8,7 @@ uniform sampler2D texture0;
 out vec4 finalColor;
 
 float gamma = 0.6;
-float numColors = 24.0;
+float numColors = 16.0;
 
 void main()
 {

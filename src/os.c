@@ -43,6 +43,14 @@ void freeOS(OS_t* os)
 
 bool commandOS(OS_t* os, char* command)
 {
+    if (os->program == CHAT) {
+        ChatPacket_t chatpacket;
+        strcpy(chatpacket.chat, command);
+        chatpacket.uid = network.client.uid;
+        sendDataClient(&chatpacket, sizeof(ChatPacket_t), PACKET_CHAT);
+        // pushchatOS(os, command);
+        return true;
+    }
     
     char args[MAX_ARGS][MAX_INPUT];
     int argc = 0;
@@ -101,6 +109,9 @@ bool commandOS(OS_t* os, char* command)
             printf("%s\n", os->lines[i]);
         }
     }
+    else if (!strcmp(args[0], "irc")) {
+        os->program = CHAT;
+    }
     else {
         char buffer[MAX_INPUT*2] = {0};
         snprintf(buffer, MAX_INPUT*2, "Command '%s' was not found\0", command);
@@ -117,10 +128,8 @@ void updateOS(OS_t* os)
     
     if (!os->grabbed) {
         if (IsKeyPressed(KEY_E)) {
-            printf("FUCKING GRAB THAT SHIT: %s\n", os->grabbed ? "yep" : "nope");
             os->grabbed = true;
             os->isskip = false;
-            printf("FUCKING GRAB THAT SHIT: %s\n", os->grabbed ? "yep" : "nope");
             
             switch (os->program)
             {
@@ -193,7 +202,7 @@ void flashOS(OS_t* os, char lines[MAX_LINES][MAX_INPUT], int num_lines)
     
 }
 
-void pushlineOS(OS_t* os, const char* line)
+void pushOS(OS_t* os, const char* line, bool ischat)
 {
     if (strlen(line) > MAX_INPUT) {
         char newline[MAX_INPUT];
@@ -204,18 +213,35 @@ void pushlineOS(OS_t* os, const char* line)
         memcpy(rest, &line[MAX_INPUT-1], strlen(line)-MAX_INPUT+1);
         rest[strlen(line)-MAX_INPUT+1] = '\0';
         
-        pushlineOS(os, newline);
-        pushlineOS(os, rest);
+        pushOS(os, newline, ischat);
+        pushOS(os, rest, ischat);
         return;
     }
     if (os->line_length == MAX_LINES) {
         for (int i = 0; i < MAX_LINES-1; i++) {
-            strcpy(os->lines[i], os->lines[i+1]);
+            if (ischat)
+                strcpy(os->chatlog[i], os->chatlog[i+1]);
+            else
+                strcpy(os->lines[i], os->lines[i+1]);
         }
     } else {
-        os->line_length++;
+        if (ischat)
+            os->chat_length++;
+        else
+            os->line_length++;
     }
-    strcpy(os->lines[os->line_length-1], line);
+    if (ischat)
+        strcpy(os->chatlog[os->chat_length-1], line);
+    else
+        strcpy(os->lines[os->line_length-1], line);
+}
+
+void pushlineOS(OS_t* os, const char* line) {
+    pushOS(os, line, false);
+}
+
+void pushchatOS(OS_t* os, const char* line) {
+    pushOS(os, line, true);
 }
 
 void drawOS(OS_t* os, Screen_t* scr)
@@ -311,12 +337,33 @@ void consoleGrab(OS_t* os)
 // Chat
 void chatUpdate(OS_t* os)
 {
-    
+    if (!network.client_running) { // TODO: Change to network.client_connected
+        if (IsKeyPressed(KEY_ENTER)) {
+            os->program = CONSOLE;
+        }
+        return;
+    }
+    consoleUpdate(os);
 }
 
 void chatDraw(OS_t* os)
 {
+    if (!network.client_running) { // TODO: Change to network.client_connected
+        int tw = MeasureText("CLIENT NOT CONNECTED", 30);
+        int rw = MeasureText("PRESS ENTER", 30);
+        DrawText("CLIENT NOT CONNECTED", floor((screen_w*screen_w_gl)/2-tw/2), floor((screen_h*screen_h_gl)/2-80), 30, WHITE);
+        DrawText("PRESS ENTER", floor((screen_w*screen_w_gl)/2-rw/2), floor((screen_h*screen_h_gl)/2-40), 30, WHITE);
+        return;
+    }
     
+    for (int i = 0; i < MAX_LINES; i++) {
+        DrawText(os->chatlog[i], 5, 5+i*22, 20, WHITE);
+    }
+    int iw = MeasureText(FormatText(">%s", os->input), 20);
+    DrawText(FormatText(">%s", os->input), 5, 5+os->chat_length*22, 20, WHITE);
+    if ((int)os->ostime%2==1) {
+        DrawRectangle(5+iw+1, 5+os->chat_length*22, 10, 20, WHITE);
+    }
 }
 
 void chatGrab(OS_t* os)
