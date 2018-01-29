@@ -19,11 +19,11 @@ else
 endif
 
 $(OUT): $(OBJ)
-	@ mkdir -p bin
+	test -d bin || mkdir bin
 	$(CC) -o bin/$(OUT) $(CFLAGS) $(OBJ) $(LIBS) $(LDFLAGS)
 
 obj/%.o: src/%.c
-	@ mkdir -p $(@D)
+	test -d $(@D) || mkdir $(@D)
 	$(CC) -c $< -o $@ $(CFLAGS)
 
 clean:
