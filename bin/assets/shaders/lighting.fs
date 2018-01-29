@@ -4,12 +4,15 @@
 in vec2 fragTexCoord;
 in vec4 fragColor;
 in vec3 fragNormal;
+in vec3 fragPos;
 
 uniform sampler2D texture0;
 
 uniform vec3 lightDirection = vec3(1.f, -0.3f, -0.5f);
 uniform vec4 diffuseLightColor = vec4(1.f, 1.f, 1.f, 1.f);
 uniform vec4 ambientLight = vec4(0.15f, 0.15f, 0.15f, 1.f);
+
+uniform vec3 viewPos;
 
 out vec4 finalColor;
 
@@ -37,7 +40,12 @@ void main()
         color += (diffuseLightColor * lightIntensity);
     }
     
-    color = clamp(color, 0.0f, 1.0f);
+    vec3 viewDir = normalize(viewPos - fragPos);
+    vec3 reflectdir = reflect(-lightDir, fragNormal);
+    float spec = pow(max(dot(viewDir, reflectdir), 0.0), 32);
+    vec3 specular = 0.01*spec*diffuseLightColor.rgb;
+    
+    color = clamp(color+vec4(specular, 1.0), 0.0f, 1.0f);
     
     vec4 c = color*textureColor;
     float fogDistance = gl_FragCoord.z/gl_FragCoord.w;

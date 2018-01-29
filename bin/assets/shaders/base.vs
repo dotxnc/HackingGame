@@ -15,6 +15,7 @@ uniform mat4 modelMatrix;
 out vec2 fragTexCoord;
 out vec4 fragColor;
 out vec3 fragNormal;
+out vec3 fragPos;
 
 // NOTE: Add here your custom variables 
 
@@ -27,6 +28,8 @@ void main()
     mat3 normalMatrix = transpose(inverse(mat3(modelMatrix)));
     fragNormal = normalize(normalMatrix*vertexNormal);
     // fragNormal =vertexNormal;
+    
+    fragPos = vec3(modelMatrix*vec4(vertexPosition, 1.0));
     
     // Calculate final vertex position
     gl_Position = mvp*vec4(vertexPosition, 1.0);

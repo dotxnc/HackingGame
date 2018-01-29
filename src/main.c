@@ -26,6 +26,8 @@ Shader depth;
 Shader posterize;
 Camera camera;
 
+int viewPos;
+
 void updatePlayerScreen(Screen_t*);
 void drawDebugText();
 
@@ -42,7 +44,7 @@ int main(int argc, char** argv)
     // load resources
     loadResourceShader("assets/shaders/base.vs", "assets/shaders/lighting.fs", "lighting");
     loadResourceShader("assets/shaders/standard.vs", "assets/shaders/depth.fs", "depth");
-    loadResourceShader("assets/shaders/standard.vs", "assets/shaders/posterize", "posterize");
+    loadResourceShader("assets/shaders/standard.vs", "assets/shaders/posterize.fs", "posterize");
     loadResourceModel("assets/models/Tower.obj", "assets/models/Tower.png", "tower");
     
     // init variables
@@ -56,6 +58,7 @@ int main(int argc, char** argv)
     // set defaults
     Shader* lighting = getResourceShader("lighting");
     lighting->locs[LOC_MATRIX_MODEL] = GetShaderLocation(*lighting, "modelMatrix");
+    viewPos = GetShaderLocation(*lighting, "viewPos");
     getResourceModel("tower")->material.shader = *getResourceShader("lighting");
     
     // deprecated
@@ -112,6 +115,8 @@ int main(int argc, char** argv)
             UpdateCamera(&camera);
         }
         
+        SetShaderValue(*lighting, viewPos, Vector3ToFloat(camera.position), 3);
+        
         if (IsKeyPressed(KEY_F1)) {
             D = !D;
         }
@@ -139,13 +144,13 @@ int main(int argc, char** argv)
                 End3dMode();
             EndTextureMode();
             
-            BeginShaderMode(posterize);
+            BeginShaderMode(*getResourceShader("posterize"));
                 DrawTextureRec(screenspace.texture, (Rectangle){0, 0, 640, -480}, (Vector2){0, 0}, WHITE);
                 drawViewmodel();
             EndShaderMode();
             
             if (D) {
-                BeginShaderMode(depth);
+                BeginShaderMode(*getResourceShader("depth"));
                     Rectangle sourceRec = {0, 0, 640, -480};
                     Rectangle destRec = { 0, 0, sourceRec.width*0.5, abs((int)(sourceRec.height*0.5)) };
                     Vector2 origin = { 0, 0 };
