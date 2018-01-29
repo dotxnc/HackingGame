@@ -7,7 +7,7 @@
 
 #include "os.h"
 
-#define MAX_MODELS 10
+#define MAX_VIEWMODELS 10
 
 typedef struct Model_t {
     Model model;
@@ -19,7 +19,7 @@ typedef struct Viewmodel_t {
     Shader shader;
     RenderTexture2D target;
     
-    Model_t models[MAX_MODELS];
+    Model_t models[MAX_VIEWMODELS];
     int num_models;
     int index;
 } Viewmodel_t;

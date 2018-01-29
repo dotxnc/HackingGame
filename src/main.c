@@ -14,6 +14,7 @@
 #include "screen.h"
 #include "os.h"
 #include "viewmodel.h"
+#include "resource.h"
 
 float post = 0.f;
 PlayerPositionPacket_t ppos;
@@ -38,6 +39,12 @@ int main(int argc, char** argv)
     SetExitKey(KEY_F12);
     SetTargetFPS(60);
     
+    // load resources
+    loadResourceShader("assets/shaders/base.vs", "assets/shaders/lighting.fs", "lighting");
+    loadResourceShader("assets/shaders/standard.vs", "assets/shaders/depth.fs", "depth");
+    loadResourceShader("assets/shaders/standard.vs", "assets/shaders/posterize", "posterize");
+    loadResourceModel("assets/models/Tower.obj", "assets/models/Tower.png", "tower");
+    
     // init variables
     camera = (Camera){{ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, 90.0f };
     Shader shader = LoadShader("assets/shaders/base.vs", "assets/shaders/lighting.fs");
@@ -47,6 +54,11 @@ int main(int argc, char** argv)
     Model tower = LoadModel("assets/models/Tower.obj");
     
     // set defaults
+    Shader* lighting = getResourceShader("lighting");
+    lighting->locs[LOC_MATRIX_MODEL] = GetShaderLocation(*lighting, "modelMatrix");
+    getResourceModel("tower")->material.shader = *getResourceShader("lighting");
+    
+    // deprecated
     tower.material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/models/Tower.png");
     tower.material.shader = shader;
     shader.locs[LOC_MATRIX_MODEL] = GetShaderLocation(shader, "modelMatrix");
@@ -59,12 +71,17 @@ int main(int argc, char** argv)
     // init components
     initNetwork();
     initOS(NULL);
-    loadScreenModels(shader);
-    initViewmodel(shader);
+    loadScreenModels(*lighting);
+    initViewmodel(*lighting);
     addViewmodel("assets/models/Hand.obj", "hand");
     addViewmodel("assets/models/Gun.obj", "gun");
     setViewmodel("hand");
     SetCameraMode(camera, CAMERA_FIRST_PERSON);
+    
+    // test resource loading
+    loadResourceShader("assets/shaders/base.vs", "assets/shaders/lighting.fs", "lighting_shader");
+    loadResourceModel("assets/models/Gun.obj", NULL, "viewmodel_gun");
+    getResourceModel("viewmodel_gun")->material.shader = *getResourceShader("lighting_shader");
     
     printf("[INFO] Initialized player at %fx %fz\n", local_screen.pos.x, local_screen.pos.z);
     
@@ -152,6 +169,7 @@ int main(int argc, char** argv)
     freeOS(NULL);
     freeScreenModels();
     freeViewmodel();
+    freeResources();
     UnloadModel(tower);
     UnloadRenderTexture(screenspace);
     UnloadShader(depth);

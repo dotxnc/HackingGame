@@ -16,6 +16,7 @@ void initViewmodel(Shader shader)
 
 void addViewmodel(const char* file, const char* name)
 {
+    if (viewmodel.num_models > MAX_VIEWMODELS-1) return;
     viewmodel.models[viewmodel.num_models].model = LoadModel(file);
     viewmodel.models[viewmodel.num_models].model.material.shader = viewmodel.shader;
     strcpy(viewmodel.models[viewmodel.num_models].name, name);
