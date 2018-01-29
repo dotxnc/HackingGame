@@ -134,6 +134,12 @@ int main(int argc, char** argv)
                 drawDebugText();
             }
             
+            if (network.client_running) {
+                if (network.client.ka_timeout < 30) {
+                    DrawText(FormatText("NETWORK TIMEOUT: %2f", network.client.ka_timeout), 0, 0, 30, RED);
+                }
+            }
+            
         
         EndDrawing();
         

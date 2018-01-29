@@ -5,6 +5,9 @@ bool initNetwork()
     network.server_running = false;
     network.client_running = false;
     
+    network.client.ka_timeout = 40;
+    network.client.ka_timer = 5;
+    
     return false;
 }
 
@@ -185,6 +188,12 @@ void updateServerNetwork()
                 }
                 free(packet);
             } break;
+            case PACKET_KEEPALIVE: {
+                KeepAlivePacket_t* packet = (KeepAlivePacket_t*)malloc(sizeof(KeepAlivePacket_t));
+                memcpy(packet, network.server.buffer, network.server.recv_len-1);
+                sendDataServer(network.server.buffer, network.server.recv_len-1, PACKET_KEEPALIVE, packet->uid);
+                free(packet);
+            } break;
             default: {
                 printf("[NET][SERVER] Packet type not handled: %d\n", packet_type);
             } break;
@@ -196,6 +205,16 @@ void updateServerNetwork()
 void updateClientNetwork()
 {
     if (!network.client_running) return;
+    
+    // keep alive
+    network.client.ka_timeout -= GetFrameTime();
+    network.client.ka_timer -= GetFrameTime();
+    if (network.client.ka_timer < 0) {
+        network.client.ka_timer = 10;
+        KeepAlivePacket_t ka;
+        ka.uid = network.client.uid;
+        sendDataClient(&ka, sizeof(KeepAlivePacket_t), PACKET_KEEPALIVE);
+    }
     
     if ((network.client.recv_len = recvfrom(network.client.socket, network.client.buffer, 512, 0, &network.client.si_other, &network.client.slen)) != SOCKET_ERROR) {
         int packet_type = network.client.buffer[network.client.recv_len-1];
@@ -242,6 +261,10 @@ void updateClientNetwork()
                 memcpy(packet, network.client.buffer, network.client.recv_len-1);
                 pushchatOS(&local_os, FormatText("%d: %s", packet->uid, packet->chat));
                 free(packet);
+            } break;
+            case PACKET_KEEPALIVE: {
+                network.client.ka_timeout = 40;
+                network.client.ka_timer = 5;
             } break;
             default: {
                 printf("[NET][CLIENT] Packet type not handled: %d\n", packet_type);

@@ -44,11 +44,21 @@ void freeOS(OS_t* os)
 bool commandOS(OS_t* os, char* command)
 {
     if (os->program == CHAT) {
+        if (command[0] == '/') {
+            if (!strcmp(command, "/leave")) {
+                os->program = CONSOLE;
+                return true;
+            }
+            else {
+                pushchatOS(os, FormatText(">>> Command %s was not found", command));
+                return false;
+            }
+        }
+        
         ChatPacket_t chatpacket;
         strcpy(chatpacket.chat, command);
         chatpacket.uid = network.client.uid;
         sendDataClient(&chatpacket, sizeof(ChatPacket_t), PACKET_CHAT);
-        // pushchatOS(os, command);
         return true;
     }
     

@@ -36,33 +36,13 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "os.h"
-#include "clientpackets.h"
-#include "serverpackets.h"
+#include "os.h" 
+#include "packets.h"
 #include "screen.h"
 
 #define MAX_CLIENTS 8
 #define DEFAULT_PORT 27015
 #define DEFAULT_IP "127.0.0.1"
-
-typedef enum PACKET_TYPE {
-    PACKET_TEST=0,
-    PACKET_CONNECT,
-    PACKET_DISCONNECT,
-    PACKET_POSITION,
-    PACKET_CHAT,
-    PACKET_UID,
-    PACKET_NEWPLAYER
-} PACKET_TYPE;
-
-// shared packets
-typedef struct TestPacket_t {
-    int test1;
-    char test2[32];
-    double test3;
-    float test4;
-} TestPacket_t;
-// shared packets
 
 typedef struct ClientInfo_t {
     int uid;
@@ -112,6 +92,9 @@ typedef struct ClientData_t {
     int uid;
     PlayerInfo_t players[MAX_CLIENTS];
     int num_players;
+    
+    float ka_timer;
+    float ka_timeout;
 } ClientData_t;
 
 typedef struct Network_t {
