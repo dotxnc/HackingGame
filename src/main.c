@@ -15,6 +15,8 @@
 #include "os.h"
 #include "viewmodel.h"
 
+#include "my_basic/my_basic.h"
+
 float post = 0.f;
 PlayerPositionPacket_t ppos;
 bool D = false;
@@ -28,8 +30,37 @@ Camera camera;
 void updatePlayerScreen(Screen_t*);
 void drawDebugText();
 
+int mb_drawString(struct mb_interpreter_t* mbi, void** l)
+{
+    char* text;
+    int x;
+    int y;
+    int s;
+    
+    mb_assert(mbi && l);
+    
+    mb_check(mb_attempt_open_bracket(mbi, l));
+    mb_check(mb_pop_string(mbi, l, &text));
+    mb_check(mb_pop_int(mbi, l, &x));
+    mb_check(mb_pop_int(mbi, l, &y));
+    mb_check(mb_pop_int(mbi, l, &s));
+    mb_check(mb_attempt_close_bracket(mbi, l));
+    
+    DrawText(text, x, y, s, WHITE);
+    // printf("fuck\n");
+    mb_check(mb_push_int(mbi, l, 0));
+    return MB_FUNC_OK;
+}
+
 int main(int argc, char** argv)
 {
+    struct mb_interpreter_t* mbi = 0;
+    
+    mb_init();
+    mb_open(&mbi);
+    mb_reg_fun(mbi, mb_drawString);
+    mb_load_string(mbi, "mb_drawString(\"This is text rendered from a script\", 10, 10, 20);", true);
+    
     // seed random
     srand(time(NULL));
     
@@ -139,11 +170,15 @@ int main(int argc, char** argv)
                     DrawText(FormatText("NETWORK TIMEOUT: %2f", network.client.ka_timeout), 0, 0, 30, RED);
                 }
             }
+            mb_run(mbi, true);
             
         
         EndDrawing();
         
     }
+    
+    mb_close(&mbi);
+    mb_dispose();
     
     freeNetwork();
     freeOS(NULL);
