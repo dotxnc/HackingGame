@@ -101,7 +101,7 @@ bool commandOS(OS_t* os, char* command)
         if (startClientNetwork(ip, port)) {
             pushlineOS(os, "FAILED TO START CLIENT");
         } else {
-            pushlineOS(os, "CREATED CLIENT SUCCESSFULY");
+            pushlineOS(os, "ATTEMPTING CONNECTION...");
         }
         return true;
     }
@@ -347,7 +347,7 @@ void consoleGrab(OS_t* os)
 // Chat
 void chatUpdate(OS_t* os)
 {
-    if (!network.client_running) { // TODO: Change to network.client_connected
+    if (!network.client_running) {
         if (IsKeyPressed(KEY_ENTER)) {
             os->program = CONSOLE;
         }
@@ -358,7 +358,7 @@ void chatUpdate(OS_t* os)
 
 void chatDraw(OS_t* os)
 {
-    if (!network.client_running) { // TODO: Change to network.client_connected
+    if (!network.client_running) {
         int tw = MeasureText("CLIENT NOT CONNECTED", 30);
         int rw = MeasureText("PRESS ENTER", 30);
         DrawText("CLIENT NOT CONNECTED", floor((screen_w*screen_w_gl)/2-tw/2), floor((screen_h*screen_h_gl)/2-80), 30, WHITE);

@@ -63,14 +63,14 @@ int main(int argc, char** argv)
     initViewmodel(shader);
     addViewmodel("assets/models/Hand.obj", "hand");
     addViewmodel("assets/models/Gun.obj", "gun");
-    setViewmodel("gun");
+    setViewmodel("hand");
     SetCameraMode(camera, CAMERA_FIRST_PERSON);
     
     printf("[INFO] Initialized player at %fx %fz\n", local_screen.pos.x, local_screen.pos.z);
     
     while (!WindowShouldClose())
     {
-        if (network.client_running) { // TODO: Change to network.client_connected
+        if (network.client_running) {
             post += GetFrameTime();
             if (post > 1.f/30.f) {
                 post = 0.f;

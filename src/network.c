@@ -210,10 +210,21 @@ void updateClientNetwork()
     network.client.ka_timeout -= GetFrameTime();
     network.client.ka_timer -= GetFrameTime();
     if (network.client.ka_timer < 0) {
-        network.client.ka_timer = 10;
+        network.client.ka_timer = 5;
         KeepAlivePacket_t ka;
         ka.uid = network.client.uid;
         sendDataClient(&ka, sizeof(KeepAlivePacket_t), PACKET_KEEPALIVE);
+    }
+    if (network.client.ka_timeout <= 0) {
+        pushlineOS(&local_os, "CONNECTION TIMED OUT");
+        network.client.ka_timeout = 40;
+        network.client.ka_timer = 5;
+        network.client_running = false;
+        #ifdef _WIN32
+            closesocket(network.client.socket);
+        #else
+            close(network.client.socket);
+        #endif
     }
     
     if ((network.client.recv_len = recvfrom(network.client.socket, network.client.buffer, 512, 0, &network.client.si_other, &network.client.slen)) != SOCKET_ERROR) {
@@ -224,7 +235,7 @@ void updateClientNetwork()
                 UIDPacket_t* packet = (UIDPacket_t*)malloc(sizeof(UIDPacket_t));
                 memcpy(packet, network.client.buffer, network.client.recv_len-1);
                 network.client.uid = packet->uid;
-                pushlineOS(&local_os, FormatText("Client got uid: %d", packet->uid));
+                pushlineOS(&local_os, FormatText("CLIENT CONNECTED WITH UID %d", packet->uid));
                 free(packet);
             } break;
             case PACKET_NEWPLAYER: {

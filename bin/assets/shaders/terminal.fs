@@ -34,9 +34,14 @@ vec2 fisheye(vec2 uv, float str )
 vec3 channelSplit(sampler2D tex, vec2 coord){
     const float spread = 0.008;
 	vec3 frag;
+    /* removed because hard to read
 	frag.r = texture(tex, vec2(coord.x - spread * sin(time), coord.y)).r;
 	frag.g = texture(tex, vec2(coord.x, 					  coord.y)).g;
 	frag.b = texture(tex, vec2(coord.x + spread * sin(time), coord.y)).b;
+    */
+	frag.r = texture(tex, vec2(coord.x, coord.y)).r;
+	frag.g = texture(tex, vec2(coord.x, coord.y)).g;
+	frag.b = texture(tex, vec2(coord.x, coord.y)).b;
 	return frag;
 }
 
