@@ -7,15 +7,28 @@
 
 #include "os.h"
 
+#define MAX_MODELS 10
+
+typedef struct Model_t {
+    Model model;
+    char name[32];
+} Model_t;
+
 typedef struct Viewmodel_t {
     Camera camera;
-    Model model;
+    Shader shader;
     RenderTexture2D target;
+    
+    Model_t models[MAX_MODELS];
+    int num_models;
+    int index;
 } Viewmodel_t;
 
 static Viewmodel_t viewmodel;
 
-void initViewmodel(const char*, Shader);
+void initViewmodel(Shader);
+void addViewmodel(const char*, const char*);
+void setViewmodel(const char*);
 void freeViewmodel();
 void renderViewmodel();
 void drawViewmodel();

@@ -1,21 +1,42 @@
 #include "viewmodel.h"
 
-void initViewmodel(const char* model, Shader shader)
+void initViewmodel(Shader shader)
 {
     // pos, up, target, fov
     viewmodel.camera = (Camera){{0, 1, 0}, {0, 1, 0}, {0, 0, -1}, 45.f};
-    viewmodel.model = LoadModel(model);
     viewmodel.target = LoadRenderTexture(640, 480);
+    viewmodel.index = -1;
+    viewmodel.shader = shader;
+    viewmodel.num_models = 0;
     
     viewmodel.camera.target = QuaternionToEuler(QuaternionFromEuler(0, 0, 0));
-    viewmodel.model.material.shader = shader;
     
     SetCameraMode(viewmodel.camera, -1);
 }
 
+void addViewmodel(const char* file, const char* name)
+{
+    viewmodel.models[viewmodel.num_models].model = LoadModel(file);
+    viewmodel.models[viewmodel.num_models].model.material.shader = viewmodel.shader;
+    strcpy(viewmodel.models[viewmodel.num_models].name, name);
+    viewmodel.num_models++;
+}
+
+void setViewmodel(const char* name)
+{
+    for (int i = 0; i < viewmodel.num_models; i++) {
+        if (strcmp(viewmodel.models[i].name, name)==0) {
+            viewmodel.index = i;
+            break;
+        }
+    }
+}
+
 void freeViewmodel()
 {
-    UnloadModel(viewmodel.model);
+    for (int i = 0; i < viewmodel.num_models; i++) {
+        UnloadModel(viewmodel.models[i].model);
+    }
     UnloadRenderTexture(viewmodel.target);
 }
 
@@ -23,6 +44,7 @@ static float d = 0.f;
 
 void renderViewmodel()
 {
+    if (viewmodel.index < 0) return;
     float mod = 1.f;
     if (IsKeyDown(KEY_LEFT_SHIFT) && !local_os.grabbed && IsKeyDown(KEY_W)) {
         mod = 5.f;
@@ -35,9 +57,9 @@ void renderViewmodel()
             Matrix m = MatrixIdentity();
             m = MatrixMultiply(m, MatrixRotateX(90*DEG2RAD));
             m = MatrixMultiply(m, MatrixRotateY(-0.8+(sin(d)*-14)*DEG2RAD));
-            viewmodel.model.transform = m;
+            viewmodel.models[viewmodel.index].model.transform = m;
             
-            DrawModel(viewmodel.model, (Vector3){0.7, -1, 0.8+sin(d)*0.05}, 1.f, WHITE);
+            DrawModel(viewmodel.models[viewmodel.index].model, (Vector3){0.7, -1, 0.8+sin(d)*0.05}, 1.f, WHITE);
         End3dMode();
     EndTextureMode();
 }

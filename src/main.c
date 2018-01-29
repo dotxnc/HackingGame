@@ -60,7 +60,10 @@ int main(int argc, char** argv)
     initNetwork();
     initOS(NULL);
     loadScreenModels(shader);
-    initViewmodel("assets/models/Hand.obj", shader);
+    initViewmodel(shader);
+    addViewmodel("assets/models/Hand.obj", "hand");
+    addViewmodel("assets/models/Gun.obj", "gun");
+    setViewmodel("gun");
     SetCameraMode(camera, CAMERA_FIRST_PERSON);
     
     printf("[INFO] Initialized player at %fx %fz\n", local_screen.pos.x, local_screen.pos.z);
