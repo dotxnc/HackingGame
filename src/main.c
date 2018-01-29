@@ -134,7 +134,7 @@ int main(int argc, char** argv)
             BeginTextureMode(screenspace);
                 Begin3dMode(camera);
                     drawPlayers();
-                    DrawModel(tower, (Vector3){0, 0, -20}, 1.f, WHITE);
+                    DrawModel(*getResourceModel("tower"), (Vector3){0, 0, -20}, 1.f, WHITE);
                     drawScreen(&local_screen);
                 End3dMode();
             EndTextureMode();
