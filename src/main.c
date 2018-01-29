@@ -130,7 +130,7 @@ int main(int argc, char** argv)
             if (D) {
                 BeginShaderMode(depth);
                     Rectangle sourceRec = {0, 0, 640, -480};
-                    Rectangle destRec = { 0, 0, sourceRec.width*0.5, abs(sourceRec.height*0.5) };
+                    Rectangle destRec = { 0, 0, sourceRec.width*0.5, abs((int)(sourceRec.height*0.5)) };
                     Vector2 origin = { 0, 0 };
                     DrawTexturePro(screenspace.depth, sourceRec, destRec, origin, 0.0f, WHITE);
                 EndShaderMode();

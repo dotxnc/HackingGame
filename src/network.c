@@ -49,14 +49,14 @@ bool startServerNetwork(int port)
     network.server.addr.sin_addr.s_addr = INADDR_ANY;
     network.server.addr.sin_port = htons(port);
     
-    int nmode = 1;
+    unsigned long nmode = 1;
     if (ioctlsocket(network.server.socket, FIONBIO, &nmode) == SOCKET_ERROR) {
         printf("[NET][SERVER] Failed to set nonblocking mode\n");
         return true;
     }
     printf("[NET][SERVER] Enabled nonblocking mode\n");
     
-    if (bind(network.server.socket, (struct sockaddr_in*)&network.server.addr, sizeof(network.server.addr)) == SOCKET_ERROR) {
+    if (bind(network.server.socket, (struct sockaddr*)&network.server.addr, sizeof(network.server.addr)) == SOCKET_ERROR) {
         printf("[NET][SERVER] Failed to bind socket\n");
         return true;
     }
@@ -97,7 +97,7 @@ bool startClientNetwork(const char* ip, int port)
         network.client.si_other.sin_addr.s_addr = inet_addr(ip);
     #endif
     
-    int nmode = 1;
+    unsigned long nmode = 1;
     if (ioctlsocket(network.client.socket, FIONBIO, &nmode) == SOCKET_ERROR) {
         printf("[NET][CLIENT] Failed to set nonblocking mode\n");
         return true;
@@ -119,7 +119,7 @@ void updateServerNetwork()
 {
     if (!network.server_running) return;
     
-    if ((network.server.recv_len = recvfrom(network.server.socket, network.server.buffer, 512, 0, &network.server.si_other, &network.server.slen)) != SOCKET_ERROR) {
+    if ((network.server.recv_len = recvfrom(network.server.socket, network.server.buffer, 512, 0, (struct sockaddr*)&network.server.si_other, &network.server.slen)) != SOCKET_ERROR) {
         int packet_type = network.server.buffer[network.server.recv_len-1];
         switch (packet_type)
         {
@@ -227,7 +227,7 @@ void updateClientNetwork()
         #endif
     }
     
-    if ((network.client.recv_len = recvfrom(network.client.socket, network.client.buffer, 512, 0, &network.client.si_other, &network.client.slen)) != SOCKET_ERROR) {
+    if ((network.client.recv_len = recvfrom(network.client.socket, network.client.buffer, 512, 0, (struct sockaddr*)&network.client.si_other, &network.client.slen)) != SOCKET_ERROR) {
         int packet_type = network.client.buffer[network.client.recv_len-1];
         switch (packet_type)
         {
@@ -292,7 +292,7 @@ bool sendDataClient(void* data, int size, int type)
     void* send = (void*)malloc(size+1);
     memcpy(send, data, size);
     memcpy(send+size, &type, 1);
-    if (sendto(network.client.socket, send, size+1, 0, &network.client.si_other, network.client.slen) == SOCKET_ERROR) {
+    if (sendto(network.client.socket, send, size+1, 0, (struct sockaddr*)&network.client.si_other, network.client.slen) == SOCKET_ERROR) {
         printf("[NET][CLIENT] Failed to send packet\n");
         free(send);
         return true;
@@ -318,7 +318,7 @@ bool sendDataServer(void* data, int size, int type, int to)
             }
         }
         if (rec != NULL) {
-            if (sendto(network.server.socket, send, size+1, 0, &rec->si_other, rec->slen) == SOCKET_ERROR) {
+            if (sendto(network.server.socket, send, size+1, 0, (struct sockaddr*)&rec->si_other, rec->slen) == SOCKET_ERROR) {
                 printf("[NET][SERVER] Failed to send packet\n");
                 free(send);
                 return true;
@@ -327,7 +327,7 @@ bool sendDataServer(void* data, int size, int type, int to)
     } else {
         for (int i = 0; i < network.server.num_clients; i++) {
             ClientInfo_t* rec = &network.server.clients[i];
-            if (sendto(network.server.socket, send, size+1, 0, &rec->si_other, rec->slen) == SOCKET_ERROR) {
+            if (sendto(network.server.socket, send, size+1, 0, (struct sockaddr*)&rec->si_other, rec->slen) == SOCKET_ERROR) {
                 printf("[NET][SERVER] Failed to send packet\n");
                 free(send);
                 return true;
