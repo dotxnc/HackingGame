@@ -42,8 +42,8 @@ void main()
     
     vec3 viewDir = normalize(viewPos - fragPos);
     vec3 reflectdir = reflect(-lightDir, fragNormal);
-    float spec = pow(max(dot(viewDir, reflectdir), 0.0), 2);
-    vec3 specular = 0.5*spec*diffuseLightColor.rgb;
+    float spec = pow(max(dot(viewDir, reflectdir), 0.0), 1);
+    vec3 specular = 0.1*spec*diffuseLightColor.rgb;
     
     color = clamp(color+vec4(specular, 1.0), 0.0f, 1.0f);
     

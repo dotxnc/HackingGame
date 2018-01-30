@@ -14,11 +14,13 @@ void initViewmodel(Shader shader)
     SetCameraMode(viewmodel.camera, -1);
 }
 
-void addViewmodel(const char* file, const char* name)
+void addViewmodel(const char* resource, const char* name)
 {
     if (viewmodel.num_models > MAX_VIEWMODELS-1) return;
-    viewmodel.models[viewmodel.num_models].model = LoadModel(file);
-    viewmodel.models[viewmodel.num_models].model.material.shader = viewmodel.shader;
+    // viewmodel.models[viewmodel.num_models].model = LoadModel(file);
+    // viewmodel.models[viewmodel.num_models].model.material.shader = viewmodel.shader;
+    viewmodel.models[viewmodel.num_models].model = getResourceModel(resource);
+    viewmodel.models[viewmodel.num_models].model->material.shader = viewmodel.shader;
     strcpy(viewmodel.models[viewmodel.num_models].name, name);
     viewmodel.num_models++;
 }
@@ -35,9 +37,6 @@ void setViewmodel(const char* name)
 
 void freeViewmodel()
 {
-    for (int i = 0; i < viewmodel.num_models; i++) {
-        UnloadModel(viewmodel.models[i].model);
-    }
     UnloadRenderTexture(viewmodel.target);
 }
 
@@ -58,9 +57,9 @@ void renderViewmodel()
             Matrix m = MatrixIdentity();
             m = MatrixMultiply(m, MatrixRotateX(90*DEG2RAD));
             m = MatrixMultiply(m, MatrixRotateY(-0.8+(sin(d)*-14)*DEG2RAD));
-            viewmodel.models[viewmodel.index].model.transform = m;
+            viewmodel.models[viewmodel.index].model->transform = m;
             
-            DrawModel(viewmodel.models[viewmodel.index].model, (Vector3){0.7, -1, 0.8+sin(d)*0.05}, 1.f, WHITE);
+            DrawModel(*viewmodel.models[viewmodel.index].model, (Vector3){0.7, -1, 0.8+sin(d)*0.05}, 1.f, WHITE);
         End3dMode();
     EndTextureMode();
 }

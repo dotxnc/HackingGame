@@ -42,10 +42,17 @@ int main(int argc, char** argv)
     SetTargetFPS(60);
     
     // load resources
-    loadResourceShader("assets/shaders/base.vs", "assets/shaders/lighting.fs", "lighting");
-    loadResourceShader("assets/shaders/standard.vs", "assets/shaders/depth.fs", "depth");
-    loadResourceShader("assets/shaders/standard.vs", "assets/shaders/posterize.fs", "posterize");
-    loadResourceModel("assets/models/Tower.obj", "assets/models/Tower.png", "tower");
+    loadResourceShader("assets/shaders/base.vs",      "assets/shaders/lighting.fs",   "lighting");
+    loadResourceShader("assets/shaders/standard.vs",  "assets/shaders/depth.fs",      "depth");
+    loadResourceShader("assets/shaders/standard.vs",  "assets/shaders/posterize.fs",  "posterize");
+    loadResourceModel("assets/models/Monitor_01.obj", "assets/models/Monitor_01.png", "monitor");
+    loadResourceModel("assets/models/Player.obj",     "assets/models/Player.png",     "player");
+    loadResourceModel("assets/models/Keyboard.obj",   "assets/models/Keyboard.png",   "keyboard");
+    loadResourceModel("assets/models/Mouse.obj",      "assets/models/Mouse.png",      "mouse");
+    loadResourceModel("assets/models/Desk_02.obj",    "assets/models/Desk_02.png",    "desk");
+    loadResourceModel("assets/models/Tower.obj",      "assets/models/Tower.png",      "tower");
+    loadResourceModel("assets/models/Gun.obj",        NULL,                           "viewmodel_gun");
+    loadResourceModel("assets/models/Hand.obj",       NULL,                           "viewmodel_hand");
     
     // init variables
     camera = (Camera){{ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, 90.0f };
@@ -76,8 +83,8 @@ int main(int argc, char** argv)
     initOS(NULL);
     loadScreenModels(*lighting);
     initViewmodel(*lighting);
-    addViewmodel("assets/models/Hand.obj", "hand");
-    addViewmodel("assets/models/Gun.obj", "gun");
+    addViewmodel("viewmodel_hand", "hand");
+    addViewmodel("viewmodel_gun", "gun");
     setViewmodel("hand");
     SetCameraMode(camera, CAMERA_FIRST_PERSON);
     

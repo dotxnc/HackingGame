@@ -10,7 +10,7 @@
 #define MAX_VIEWMODELS 10
 
 typedef struct Model_t {
-    Model model;
+    Model* model;
     char name[32];
 } Model_t;
 

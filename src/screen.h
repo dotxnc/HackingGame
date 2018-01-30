@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "resource.h"
+
 typedef struct Screen_t {
     bool in_use;
     Vector3 pos;
