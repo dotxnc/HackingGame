@@ -26,12 +26,12 @@ void initOS(OS_t* os)
     for (int i = 0; i < MAX_LINES; i++)
         memset(local_os.chatlog[i], '\0', MAX_INPUT);
     
-    terminal_buffer = LoadRenderTexture(screen_w*screen_w_gl, screen_h*screen_h_gl);
+    terminal_buffer = LoadRenderTexture(screen_w, screen_h);
     terminal_shader = LoadShader("assets/shaders/standard.vs", "assets/shaders/terminal.fs");
     terminal_time_pos = GetShaderLocation(terminal_shader, "time");
     terminal_screensize_pos = GetShaderLocation(terminal_shader, "screensize");
     
-    int screensize[2] = {screen_w*screen_w_gl, screen_h*screen_h_gl};
+    int screensize[2] = {screen_w, screen_h};
     SetShaderValuei(terminal_shader, terminal_screensize_pos, screensize, 2);
     
 }
@@ -257,7 +257,7 @@ void pushchatOS(OS_t* os, const char* line) {
 void drawOS(OS_t* os, Screen_t* scr)
 {
     BeginTextureMode(terminal_buffer);
-        DrawRectangle(0, 0, scr->texture.texture.width*screen_w_gl, scr->texture.texture.height*screen_h_gl, DARKGRAY);
+        DrawRectangle(0, 0, scr->texture.texture.width*screen_w_gl, scr->texture.texture.height, DARKGRAY);
         switch (os->program)
         {
             case CONSOLE:
@@ -282,8 +282,8 @@ void drawOS(OS_t* os, Screen_t* scr)
         
     BeginTextureMode(scr->texture);
         BeginShaderMode(terminal_shader);
-            DrawRectangle(0, 0, terminal_buffer.texture.width*screen_w_gl, terminal_buffer.texture.height*screen_h_gl, DARKGRAY);
-            DrawTextureRec(terminal_buffer.texture, (Rectangle){0, 0, terminal_buffer.texture.width*screen_w_gl, -terminal_buffer.texture.height*screen_h_gl}, (Vector2){0, 0}, WHITE);
+            DrawRectangle(0, 0, terminal_buffer.texture.width, terminal_buffer.texture.height, DARKGRAY);
+            DrawTextureRec(terminal_buffer.texture, (Rectangle){0, 0, -terminal_buffer.texture.width, -terminal_buffer.texture.height}, (Vector2){0, 0}, WHITE);
         EndShaderMode();
     EndTextureMode();
 }
@@ -361,8 +361,8 @@ void chatDraw(OS_t* os)
     if (!network.client_running) {
         int tw = MeasureText("CLIENT NOT CONNECTED", 30);
         int rw = MeasureText("PRESS ENTER", 30);
-        DrawText("CLIENT NOT CONNECTED", floor((screen_w*screen_w_gl)/2-tw/2), floor((screen_h*screen_h_gl)/2-80), 30, WHITE);
-        DrawText("PRESS ENTER", floor((screen_w*screen_w_gl)/2-rw/2), floor((screen_h*screen_h_gl)/2-40), 30, WHITE);
+        DrawText("CLIENT NOT CONNECTED", floor((screen_w)/2-tw/2), floor((screen_h)/2-80), 30, WHITE);
+        DrawText("PRESS ENTER", floor((screen_w)/2-rw/2), floor((screen_h)/2-40), 30, WHITE);
         return;
     }
     

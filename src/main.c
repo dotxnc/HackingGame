@@ -4,12 +4,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <pthread.h>
 
 #include <raylib.h>
 #include <raymath.h>
+
 #define CAMERA_IMPLEMENTATION
 #include "camera.h"
-
 #include "network.h"
 #include "screen.h"
 #include "os.h"
@@ -30,6 +31,7 @@ int viewPos;
 
 void updatePlayerScreen(Screen_t*);
 void drawDebugText();
+void renderScene();
 
 int main(int argc, char** argv)
 {
@@ -56,9 +58,6 @@ int main(int argc, char** argv)
     
     // init variables
     camera = (Camera){{ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, 90.0f };
-    Shader shader = LoadShader("assets/shaders/base.vs", "assets/shaders/lighting.fs");
-    depth         = LoadShader("assets/shaders/standard.vs", "assets/shaders/depth.fs");
-    posterize     = LoadShader("assets/shaders/standard.vs", "assets/shaders/posterize.fs");
     screenspace = LoadRenderTexture(640, 480);
     Model tower = LoadModel("assets/models/Tower.obj");
     
@@ -69,9 +68,6 @@ int main(int argc, char** argv)
     getResourceModel("tower")->material.shader = *getResourceShader("lighting");
     
     // deprecated
-    tower.material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/models/Tower.png");
-    tower.material.shader = shader;
-    shader.locs[LOC_MATRIX_MODEL] = GetShaderLocation(shader, "modelMatrix");
     local_screen.pos.x = -20+rand()%40;
     local_screen.pos.z = -20+rand()%40;
     camera.position = (Vector3){local_screen.pos.x+3.0f, 3.65f, local_screen.pos.z+3.0f};
@@ -87,11 +83,6 @@ int main(int argc, char** argv)
     addViewmodel("viewmodel_gun", "gun");
     setViewmodel("hand");
     SetCameraMode(camera, CAMERA_FIRST_PERSON);
-    
-    // test resource loading
-    loadResourceShader("assets/shaders/base.vs", "assets/shaders/lighting.fs", "lighting_shader");
-    loadResourceModel("assets/models/Gun.obj", NULL, "viewmodel_gun");
-    getResourceModel("viewmodel_gun")->material.shader = *getResourceShader("lighting_shader");
     
     printf("[INFO] Initialized player at %fx %fz\n", local_screen.pos.x, local_screen.pos.z);
     
@@ -182,10 +173,7 @@ int main(int argc, char** argv)
     freeScreenModels();
     freeViewmodel();
     freeResources();
-    UnloadModel(tower);
     UnloadRenderTexture(screenspace);
-    UnloadShader(depth);
-    UnloadShader(posterize);
     
     CloseWindow();
     
@@ -203,4 +191,9 @@ void drawDebugText()
     DrawText(FormatText("FPS: %d", GetFPS()), 10, yoff, 20, RAYWHITE);
     DrawText(FormatText("POS: %2f %2f %2f", camera.position.x, camera.position.y, camera.position.z), 10, yoff+15, 20, RAYWHITE);
     DrawText(FormatText("TAR: %2f %2f %2f", camera.target.x, camera.target.y, camera.target.z), 10, yoff+15+15, 20, RAYWHITE);
+}
+
+void renderScene()
+{
+    
 }
