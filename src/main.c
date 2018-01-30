@@ -23,15 +23,11 @@ bool D = false;
 bool MLOCK = true;
 
 RenderTexture2D screenspace;
-Shader depth;
-Shader posterize;
 Camera camera;
-
 int viewPos;
 
 void updatePlayerScreen(Screen_t*);
 void drawDebugText();
-void renderScene();
 
 int main(int argc, char** argv)
 {
@@ -59,15 +55,12 @@ int main(int argc, char** argv)
     // init variables
     camera = (Camera){{ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, 90.0f };
     screenspace = LoadRenderTexture(640, 480);
-    Model tower = LoadModel("assets/models/Tower.obj");
     
     // set defaults
     Shader* lighting = getResourceShader("lighting");
     lighting->locs[LOC_MATRIX_MODEL] = GetShaderLocation(*lighting, "modelMatrix");
     viewPos = GetShaderLocation(*lighting, "viewPos");
-    getResourceModel("tower")->material.shader = *getResourceShader("lighting");
-    
-    // deprecated
+    getResourceModel("tower")->material.shader = *lighting;
     local_screen.pos.x = -20+rand()%40;
     local_screen.pos.z = -20+rand()%40;
     camera.position = (Vector3){local_screen.pos.x+3.0f, 3.65f, local_screen.pos.z+3.0f};
@@ -120,6 +113,12 @@ int main(int argc, char** argv)
         }
         if (IsKeyPressed(KEY_F2)) {
             MLOCK = !MLOCK;
+        }
+        if (GetMouseWheelMove()>0) {
+            nextViewmodel();
+        }
+        else if (GetMouseWheelMove()<0) {
+            prevViewmodel();
         }
         
         if (MLOCK)
@@ -191,9 +190,4 @@ void drawDebugText()
     DrawText(FormatText("FPS: %d", GetFPS()), 10, yoff, 20, RAYWHITE);
     DrawText(FormatText("POS: %2f %2f %2f", camera.position.x, camera.position.y, camera.position.z), 10, yoff+15, 20, RAYWHITE);
     DrawText(FormatText("TAR: %2f %2f %2f", camera.target.x, camera.target.y, camera.target.z), 10, yoff+15+15, 20, RAYWHITE);
-}
-
-void renderScene()
-{
-    
 }

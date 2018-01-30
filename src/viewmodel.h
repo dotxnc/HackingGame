@@ -22,6 +22,11 @@ typedef struct Viewmodel_t {
     Model_t models[MAX_VIEWMODELS];
     int num_models;
     int index;
+    
+    float swap_timer;
+    bool swapping;
+    int swap_to;
+    float swap_offset;
 } Viewmodel_t;
 
 static Viewmodel_t viewmodel;
@@ -29,6 +34,8 @@ static Viewmodel_t viewmodel;
 void initViewmodel(Shader);
 void addViewmodel(const char*, const char*);
 void setViewmodel(const char*);
+void nextViewmodel();
+void prevViewmodel();
 void freeViewmodel();
 void renderViewmodel();
 void drawViewmodel();
