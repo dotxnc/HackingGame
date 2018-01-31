@@ -21,19 +21,13 @@ void loadScreenModels(Shader lighting)
     screen_mesh = GenMeshPlane(screen_w_gl, screen_h_gl, 5, 5);
     screen_viewer = LoadModelFromMesh(screen_mesh);
     
-    screen_desk->material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/models/Desk_02.png");
-    screen_monitor->material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/models/Monitor_01.png");
-    screen_keyboard->material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/models/Keyboard.png");
-    screen_mouse->material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/models/Mouse.png");
-    screen_player->material.maps[MAP_DIFFUSE].texture = LoadTexture("assets/models/Player.png");
-    
     screen_desk->material.shader = lighting;
     screen_monitor->material.shader = lighting;
     screen_keyboard->material.shader = lighting;
     screen_mouse->material.shader = lighting;
     screen_player->material.shader = lighting;
     
-    screen_viewer.material.shader = lighting;
+    screen_viewer.material.shader = *getResourceShader("distort");
     
     local_screen.in_use = false;
     local_screen.texture = LoadRenderTexture(screen_w, screen_h);
@@ -67,7 +61,6 @@ void drawScreen(Screen_t* screen)
     vpos = Vector3Add(vpos, screen->pos);
     vpos = Vector3Add(vpos, screen_offset);
     vpos = Vector3Add(vpos, (Vector3){0.f, 0.885f, -0.07f});
-    // vpos = Vector3Add(vpos, (Vector3){0.f, 0.885f, 0.1f});
     screen_viewer.material.maps[MAP_DIFFUSE].texture = screen->texture.texture;
     DrawModel(screen_viewer, vpos, 1.f, WHITE);
 }

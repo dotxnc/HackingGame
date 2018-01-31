@@ -43,6 +43,7 @@ int main(int argc, char** argv)
     loadResourceShader("assets/shaders/base.vs",      "assets/shaders/lighting.fs",   "lighting");
     loadResourceShader("assets/shaders/standard.vs",  "assets/shaders/depth.fs",      "depth");
     loadResourceShader("assets/shaders/standard.vs",  "assets/shaders/posterize.fs",  "posterize");
+    loadResourceShader("assets/shaders/base.vs",      NULL,                           "distort");
     loadResourceModel("assets/models/Monitor_01.obj", "assets/models/Monitor_01.png", "monitor");
     loadResourceModel("assets/models/Player.obj",     "assets/models/Player.png",     "player");
     loadResourceModel("assets/models/Keyboard.obj",   "assets/models/Keyboard.png",   "keyboard");
