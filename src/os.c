@@ -19,6 +19,7 @@ void initOS(OS_t* os)
     local_os.bootline = 0;
     local_os.bootline_timeout = 0.f;
     local_os.username_length = 0;
+    local_os.backspace_timer = 0.f;
     
     flashOS(&local_os, NULL, 0);
     memset(local_os.input,'\0',MAX_INPUT);
@@ -122,6 +123,13 @@ bool commandOS(OS_t* os, char* command)
     else if (!strcmp(args[0], "irc")) {
         os->program = CHAT;
     }
+    else if (!strcmp(args[0], "help")) {
+        pushlineOS(os, "COMMANDS:");
+        pushlineOS(os, "SERVER <N>: RUNS SERVER ON PORT 'N'");
+        pushlineOS(os, "CLIENT <I> <N>: CONNECTS TO 'I' ON PORT 'N'");
+        pushlineOS(os, "CLEAR: RESETS THE BUFFER");
+        pushlineOS(os, "IRC: CONNECTS TO IRC CHAT CHANNEL");
+    }
     else {
         char buffer[MAX_INPUT*2] = {0};
         snprintf(buffer, MAX_INPUT*2, "Command '%s' was not found\0", command);
@@ -135,6 +143,9 @@ void updateOS(OS_t* os)
     os->ostime += GetFrameTime()*2;
     terminal_time += GetFrameTime();
     SetShaderValue(terminal_shader, terminal_time_pos, &terminal_time, 1);
+    os->backspace_timer += GetFrameTime();
+    if (os->backspace_timer > 1) os->backspace_timer = 1;
+    if (IsKeyUp(KEY_BACKSPACE)) os->backspace_timer = 1;
     
     if (!os->grabbed) {
         if (IsKeyPressed(KEY_E)) {
@@ -295,10 +306,19 @@ void consoleUpdate(OS_t* os)
 {
     int k = GetKeyPressed();
     bool k_is_allowed = false;
-    for (int i = 0; i < strlen(clist); i++) {
-        if (clist[i] == k) {
-            k_is_allowed = true;
-            break;
+    if (os->program == CONSOLE) {
+        for (int i = 0; i < strlen(clist); i++) {
+            if (clist[i] == k) {
+                k_is_allowed = true;
+                break;
+            }
+        }
+    } else if (os->program == CHAT){
+        for (int i = 0; i < strlen(chatclist); i++) {
+            if (chatclist[i] == k) {
+                k_is_allowed = true;
+                break;
+            }
         }
     }
     if (k_is_allowed) {
@@ -306,11 +326,11 @@ void consoleUpdate(OS_t* os)
             os->input[os->input_length] = (char)k;
             os->input_length++;
         }
-    } else if (IsKeyPressed(KEY_BACKSPACE)) {
+    } else if (IsKeyDown(KEY_BACKSPACE) && os->backspace_timer > BACKSPACE_TIMEOUT) {
         if (os->input_length > 0) {
-            os->input[os->input_length-1] = 0;
-            os->input[os->input_length] = '\0';
+            os->input[os->input_length-1] = '\0';
             os->input_length--;
+            os->backspace_timer = 0;
         }
     } else if (k == 32) {
         if (os->input_length < MAX_INPUT) {
@@ -321,9 +341,6 @@ void consoleUpdate(OS_t* os)
         commandOS(os, os->input);
         memset(os->input,'\0',MAX_INPUT);
         os->input_length = 0;
-    }
-    else if (k > -1) {
-        // printf("%d\n", k);
     }
 }
 
@@ -445,18 +462,16 @@ void loginUpdate(OS_t* os)
             os->username[os->username_length] = (char)k;
             os->username_length++;
         }
-    } else if (IsKeyPressed(KEY_BACKSPACE)) {
+    } else if (IsKeyDown(KEY_BACKSPACE) && os->backspace_timer > BACKSPACE_TIMEOUT) {
         if (os->username_length > 0) {
             os->username[os->username_length-1] = '\0';
             os->username_length--;
+            os->backspace_timer = 0;
         }
     } else if (IsKeyPressed(KEY_ENTER)) {
         flashOS(os,NULL,0);
-        pushlineOS(os, FormatText("Welcome to your terminal, %s.", os->username));
+        pushlineOS(os, FormatText("Welcome to your p2 terminal, %s.", os->username));
         os->program = CONSOLE;
-    }
-    else if (k > -1) {
-        // printf("%d\n", k);
     }
 }
 

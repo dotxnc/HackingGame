@@ -35,7 +35,7 @@ int main(int argc, char** argv)
     srand(time(NULL));
     
     // init window
-    InitWindow(640, 480, "Hack");
+    InitWindow(640, 480, "P²");
     SetExitKey(KEY_F12);
     SetTargetFPS(60);
     
@@ -190,4 +190,5 @@ void drawDebugText()
     DrawText(FormatText("FPS: %d", GetFPS()), 10, yoff, 20, RAYWHITE);
     DrawText(FormatText("POS: %2f %2f %2f", camera.position.x, camera.position.y, camera.position.z), 10, yoff+15, 20, RAYWHITE);
     DrawText(FormatText("TAR: %2f %2f %2f", camera.target.x, camera.target.y, camera.target.z), 10, yoff+15+15, 20, RAYWHITE);
+    DrawText(FormatText("MAX_INPUT TEST: %d %d", local_os.input_length, MAX_INPUT), 10, yoff+15+15+15, 20, RAYWHITE);
 }

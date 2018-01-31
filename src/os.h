@@ -8,16 +8,18 @@
 #include <string.h>
 #include <math.h>
 
-#include "screen.h"
-#include "network.h"
-
-#define MAX_INPUT 45
+#define MAX_INPUT 32
 #define MAX_LINES 22
 #define MAX_ARGS 5
 #define MAX_USERNAME 16
 #define MAX_READOUTS 10
+#define BACKSPACE_TIMEOUT 0.2
 
-const char* const clist = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()-=_+:;\"'<>?,./";
+#include "screen.h"
+#include "network.h"
+
+const char* const chatclist = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()-=_+:;\"'<>?,./";
+const char* const clist = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 const char* const boot_lines[MAX_READOUTS] = {
     "booting... OK",
     "loading drive... OK",
@@ -59,6 +61,7 @@ typedef struct OS_t {
     bool grabbed;
     bool isskip;
     float ostime;
+    float backspace_timer;
 } OS_t;
 
 OS_t local_os;

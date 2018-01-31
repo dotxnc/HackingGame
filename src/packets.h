@@ -1,6 +1,6 @@
 #ifndef PACKETS_H
 #define PACKETS_H
-#define MAX_INPUT 45
+#include "os.h"
 
 typedef enum PACKET_TYPE {
     PACKET_TEST=0,
