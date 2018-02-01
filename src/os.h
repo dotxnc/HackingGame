@@ -8,7 +8,7 @@
 #include <string.h>
 #include <math.h>
 
-#define MAX_INPUT 32
+#define MAX_INPUT 44
 #define MAX_LINES 22
 #define MAX_ARGS 5
 #define MAX_USERNAME 16
@@ -17,6 +17,7 @@
 
 #include "screen.h"
 #include "network.h"
+#include "resource.h"
 
 const char* const chatclist = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()-=_+:;\"'<>?,./";
 const char* const clist = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";

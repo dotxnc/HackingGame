@@ -9,7 +9,7 @@ inline static float lerp(float to, float from, float time) {
 void initViewmodel(Shader shader)
 {
     // pos, up, target, fov
-    viewmodel.camera = (Camera){{0, 1, 0}, {0, 1, 0}, {0, 0, -1}, 45.f};
+    viewmodel.camera = (Camera){{0, 0, 0}, {0, 0, -1}, {0, 1, 0}, 45.f};
     viewmodel.target = LoadRenderTexture(640, 480);
     viewmodel.index = -1;
     viewmodel.shader = shader;
@@ -19,9 +19,9 @@ void initViewmodel(Shader shader)
     viewmodel.swap_to = -1;
     viewmodel.swapping = false;
     
-    viewmodel.camera.target = QuaternionToEuler(QuaternionFromEuler(0, 0, 0));
+    // viewmodel.camera.target = QuaternionToEuler(QuaternionFromEuler(0, 0, 0));
     
-    SetCameraMode(viewmodel.camera, -1);
+    // SetCameraMode(viewmodel.camera, -1);
 }
 
 void addViewmodel(const char* resource, const char* name)
@@ -92,11 +92,11 @@ void renderViewmodel()
         Begin3dMode(viewmodel.camera);
             
             Matrix m = MatrixIdentity();
-            m = MatrixMultiply(m, MatrixRotateX(90*DEG2RAD));
-            m = MatrixMultiply(m, MatrixRotateY(-0.8+(sin(d)*-14)*DEG2RAD));
+            // m = MatrixMultiply(m, MatrixRotateX(90*DEG2RAD));
+            m = MatrixMultiply(m, MatrixRotateZ(-0.2+(sin(d)*-14)*DEG2RAD));
             viewmodel.models[viewmodel.index].model->transform = m;
             
-            DrawModel(*viewmodel.models[viewmodel.index].model, (Vector3){0.7, -1+viewmodel.swap_offset, 0.8+sin(d)*0.05+viewmodel.swap_offset}, 1.f, WHITE);
+            DrawModel(*viewmodel.models[viewmodel.index].model, (Vector3){0.7, -0.9, -2.2}, 1.f, WHITE);
         End3dMode();
     EndTextureMode();
 }

@@ -36,7 +36,7 @@ typedef struct ResourceManager_t {
 
 static ResourceManager_t resource_manager;
 
-bool loadResourceShader(const char*, const char*, const char*);
+bool loadResourceShader(char*, char*, const char*);
 bool loadResourceModel(const char*, const char*, const char*);
 bool loadResourceTexture(const char*, const char*);
 Shader* getResourceShader(const char*);

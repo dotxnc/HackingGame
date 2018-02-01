@@ -27,8 +27,8 @@ vec2 fisheye(vec2 uv, float str )
     vec2 offset;
     offset.x = ( pow(neg1to1.y,2.0)) * str * (neg1to1.x);
     offset.y = ( pow(neg1to1.x,2.0)) * str * (neg1to1.y);
-    offset.x = floor(offset.x*500)/500;
-    offset.y = floor(offset.y*500)/500;
+    // offset.x = floor(offset.x*500)/500;
+    // offset.y = floor(offset.y*500)/500;
     
     return uv + offset;
 }

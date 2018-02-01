@@ -1,6 +1,6 @@
 #include "resource.h"
 
-bool loadResourceShader(const char* vertex_file, const char* fragment_file, const char* ID)
+bool loadResourceShader(char* vertex_file, char* fragment_file, const char* ID)
 {
     if (resource_manager.num_shaders > MAX_SHADERS-1) return false;
     resource_manager.shaders[resource_manager.num_shaders].shader = LoadShader(vertex_file, fragment_file);

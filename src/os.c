@@ -28,7 +28,7 @@ void initOS(OS_t* os)
         memset(local_os.chatlog[i], '\0', MAX_INPUT);
     
     terminal_buffer = LoadRenderTexture(screen_w, screen_h);
-    terminal_shader = LoadShader("assets/shaders/standard.vs", "assets/shaders/terminal.fs");
+    terminal_shader = *getResourceShader("terminal");
     terminal_time_pos = GetShaderLocation(terminal_shader, "time");
     terminal_screensize_pos = GetShaderLocation(terminal_shader, "screensize");
     
@@ -267,6 +267,7 @@ void pushchatOS(OS_t* os, const char* line) {
 
 void drawOS(OS_t* os, Screen_t* scr)
 {
+    SetTextureFilter(GetDefaultFont().texture, FILTER_POINT);
     BeginTextureMode(terminal_buffer);
         DrawRectangle(0, 0, scr->texture.texture.width*screen_w_gl, scr->texture.texture.height, DARKGRAY);
         switch (os->program)
@@ -326,7 +327,7 @@ void consoleUpdate(OS_t* os)
             os->input[os->input_length] = (char)k;
             os->input_length++;
         }
-    } else if (IsKeyDown(KEY_BACKSPACE) && os->backspace_timer > BACKSPACE_TIMEOUT) {
+    } else if (k == -2) {
         if (os->input_length > 0) {
             os->input[os->input_length-1] = '\0';
             os->input_length--;
@@ -341,6 +342,8 @@ void consoleUpdate(OS_t* os)
         commandOS(os, os->input);
         memset(os->input,'\0',MAX_INPUT);
         os->input_length = 0;
+    } else if (k != -1  ) {
+        printf("K = %d\n", k);
     }
 }
 
