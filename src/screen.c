@@ -33,7 +33,7 @@ void loadScreenModels(Shader lighting)
     local_screen.texture = LoadRenderTexture(screen_w, screen_h);
     
     screen_offset.x = -0.4f;
-    screen_offset.y = 2.6f;
+    screen_offset.y = 2.5f;
     screen_offset.z = 0.5f;
 }
 

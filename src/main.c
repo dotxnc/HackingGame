@@ -23,6 +23,7 @@ bool D = false;
 bool MLOCK = true;
 
 RenderTexture2D screenspace;
+RenderTexture2D depthspace;
 Camera camera;
 int viewPos;
 
@@ -45,22 +46,27 @@ int main(int argc, char** argv)
     loadResourceShader("assets/shaders/standard.vs",  "assets/shaders/posterize.fs",  "posterize");
     loadResourceShader("assets/shaders/base.vs",      NULL,                           "distort");
     loadResourceShader("assets/shaders/standard.vs",  "assets/shaders/terminal.fs",   "terminal");
+    loadResourceShader("assets/shaders/standard.vs",  "assets/shaders/ssao.fs",       "ssao");
     loadResourceModel("assets/models/Monitor_01.obj", "assets/models/Monitor_01.png", "monitor");
     loadResourceModel("assets/models/Player.obj",     "assets/models/Player.png",     "player");
     loadResourceModel("assets/models/Keyboard.obj",   "assets/models/Keyboard.png",   "keyboard");
     loadResourceModel("assets/models/Mouse.obj",      "assets/models/Mouse.png",      "mouse");
     loadResourceModel("assets/models/Desk_02.obj",    "assets/models/Desk_02.png",    "desk");
     loadResourceModel("assets/models/Tower.obj",      "assets/models/Tower.png",      "tower");
-    loadResourceModel("assets/models/Gun.obj",        NULL,                           "viewmodel_gun");
-    loadResourceModel("assets/models/Hand.obj",       NULL,                           "viewmodel_hand");
+    loadResourceModel("assets/models/Gun.obj",        "assets/models/Gun.png",        "viewmodel_gun");
+    loadResourceModel("assets/models/Hand.obj",       "assets/models/Hand.png",       "viewmodel_hand");
+    loadResourceTexture("assets/textures/noise.png", "noise");
     
     // init variables
     camera = (Camera){{ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, 90.0f };
     screenspace = LoadRenderTexture(640, 480);
+    depthspace = LoadRenderTexture(640, 480);
     
     // set defaults
     Shader* lighting = getResourceShader("lighting");
     lighting->locs[LOC_MATRIX_MODEL] = GetShaderLocation(*lighting, "modelMatrix");
+    Shader* ssao = getResourceShader("ssao");
+    
     viewPos = GetShaderLocation(*lighting, "viewPos");
     getResourceModel("tower")->material.shader = *lighting;
     local_screen.pos.x = -20+rand()%40;
@@ -149,12 +155,17 @@ int main(int argc, char** argv)
             EndShaderMode();
             
             if (D) {
-                BeginShaderMode(*getResourceShader("depth"));
-                    Rectangle sourceRec = {0, 0, 640, -480};
-                    Rectangle destRec = { 0, 0, sourceRec.width*0.5, abs((int)(sourceRec.height*0.5)) };
-                    Vector2 origin = { 0, 0 };
-                    DrawTexturePro(screenspace.depth, sourceRec, destRec, origin, 0.0f, WHITE);
-                EndShaderMode();
+                BeginTextureMode(depthspace);
+                    BeginShaderMode(*getResourceShader("depth"));
+                        Rectangle sourceRec = {0, 0, 640, -480};
+                        Rectangle destRec = { 0, 0, sourceRec.width, abs((sourceRec.height)) };
+                        Vector2 origin = { 0, 0 };
+                        DrawTexturePro(screenspace.depth, sourceRec, destRec, origin, 0.0f, WHITE);
+                    EndShaderMode();
+                EndTextureMode();
+                
+                destRec = (Rectangle){ 0, 0, sourceRec.width*0.5, abs((int)(sourceRec.height*0.5)) };
+                DrawTexturePro(screenspace.texture, sourceRec, destRec, origin, 0.0f, WHITE);
                 drawDebugText();
             }
             
