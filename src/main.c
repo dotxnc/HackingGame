@@ -149,7 +149,7 @@ int main(int argc, char** argv)
                 UpdateCamera(&camera);
         }
         if (enter_screen_view) {
-            lerp_view_rate = 1.0f/2.f;
+            lerp_view_rate = 1.0f/1.f;
             if (lerp_view_time < 1.f) {
                 lerp_view_time += GetFrameTime() * lerp_view_rate;
                 Vector3 topos = {local_screen.pos.x+screen_offset.x, local_screen.pos.y+screen_offset.y+0.88, local_screen.pos.z+screen_offset.z+0.5};
@@ -157,19 +157,27 @@ int main(int argc, char** argv)
                 camera.position.y = cerp(old_view_pos.y, topos.y, lerp_view_time);
                 camera.position.z = cerp(old_view_pos.z, topos.z, lerp_view_time);
                 
-                camera.target = (Vector3){topos.x, topos.y, topos.z-1};
+                camera.target.x = cerp(old_view_target.x, topos.x, lerp_view_time);
+                camera.target.y = cerp(old_view_target.y, topos.y, lerp_view_time);
+                camera.target.z = cerp(old_view_target.z, topos.z-1, lerp_view_time);
             }
         }
         
         if (leave_screen_view) {
-            lerp_view_rate = 1.0f/2.f;
+            lerp_view_rate = 1.0f/1.f;
             if (lerp_view_time < 1.f) {
                 lerp_view_time += GetFrameTime() * lerp_view_rate;
-                camera.position.x = lerp(local_screen.pos.x+screen_offset.x, old_view_pos.x, lerp_view_time);
-                camera.position.y = lerp(local_screen.pos.y+screen_offset.y+0.88, old_view_pos.y, lerp_view_time);
-                camera.position.z = lerp(local_screen.pos.z+screen_offset.z+0.5, old_view_pos.z, lerp_view_time);
+                Vector3 topos = {local_screen.pos.x+screen_offset.x, local_screen.pos.y+screen_offset.y+0.88, local_screen.pos.z+screen_offset.z+0.5};
                 
-                camera.target = old_view_target;
+                camera.position.x = cerp(local_screen.pos.x+screen_offset.x, old_view_pos.x, lerp_view_time);
+                camera.position.y = cerp(local_screen.pos.y+screen_offset.y+0.88, old_view_pos.y, lerp_view_time);
+                camera.position.z = cerp(local_screen.pos.z+screen_offset.z+0.5, old_view_pos.z, lerp_view_time);
+                
+                camera.target.x = cerp(topos.x, old_view_target.x, lerp_view_time);
+                camera.target.y = cerp(topos.y, old_view_target.y, lerp_view_time);
+                camera.target.z = cerp(topos.z-1, old_view_target.z, lerp_view_time);
+                
+                // camera.target = old_view_target;
             } else {
                 leave_screen_view = false;
             }
