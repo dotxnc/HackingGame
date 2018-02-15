@@ -21,6 +21,7 @@ const int screen_w = 512;
 const int screen_h = 512;
 
 Screen_t local_screen;
+Vector3 screen_offset;
 
 void loadScreenModels(Shader);
 void freeScreenModels();

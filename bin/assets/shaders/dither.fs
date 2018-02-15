@@ -103,7 +103,12 @@ vec4 dither8x8(vec2 position, vec4 color) {
 
 void main()
 {
-    vec4 color = texture(texture0, fragUV);
-    finalColor = dither8x8(fragTexCoord*vec2(800,600), color)*2;
-    finalColor = color;
+    vec4 color = texture(texture0, fragTexCoord);
+    if (color==vec4(0, 0, 0, 0)) {
+        // finalColor = vec4(c1, 0);
+        // return;
+        discard;
+    }
+    finalColor = dither8x8(fragTexCoord*vec2(640,480), color)*8;
+    // finalColor = color;
 }

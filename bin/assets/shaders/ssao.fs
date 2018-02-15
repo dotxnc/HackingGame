@@ -28,5 +28,5 @@ vec3 normalFromDepth(float depth)
 void main()
 {
     // finalColor = vec4(normalFromDepth(texture(texture0, fragTexCoord).r), 0);
-    finalColor = texture(texture0, fragTexCoord);
+    finalColor = texture(texture1, fragTexCoord);
 }

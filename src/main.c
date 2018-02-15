@@ -17,10 +17,26 @@
 #include "viewmodel.h"
 #include "resource.h"
 
+inline static float cerp(float to, float from, float time) {
+    // return to+(from-to)*time;
+    float f = (1-cos(time*PI))*0.5f;
+    return to*(1-f)+from*f;
+}
+
+inline static float lerp(float to, float from, float time) {
+    return (1-time)*to + time*from;
+}
+
 float post = 0.f;
 PlayerPositionPacket_t ppos;
 bool D = false;
 bool MLOCK = true;
+bool enter_screen_view = false;
+bool leave_screen_view = false;
+float lerp_view_time = 0;
+float lerp_view_rate = 0;
+Vector3 old_view_pos = {0};
+Vector3 old_view_target = {0};
 
 RenderTexture2D screenspace;
 RenderTexture2D depthspace;
@@ -44,6 +60,7 @@ int main(int argc, char** argv)
     loadResourceShader("assets/shaders/base.vs",      "assets/shaders/lighting.fs",   "lighting");
     loadResourceShader("assets/shaders/standard.vs",  "assets/shaders/depth.fs",      "depth");
     loadResourceShader("assets/shaders/standard.vs",  "assets/shaders/posterize.fs",  "posterize");
+    loadResourceShader("assets/shaders/standard.vs",  "assets/shaders/dither.fs",     "dither");
     loadResourceShader("assets/shaders/base.vs",      NULL,                           "distort");
     loadResourceShader("assets/shaders/standard.vs",  "assets/shaders/terminal.fs",   "terminal");
     loadResourceShader("assets/shaders/standard.vs",  "assets/shaders/ssao.fs",       "ssao");
@@ -104,6 +121,22 @@ int main(int argc, char** argv)
         updateClientNetwork();
         updateServerNetwork();
         
+        
+        if (!local_os.grabbed && IsKeyPressed(KEY_E)) {
+            leave_screen_view = false;
+            enter_screen_view = true;
+            lerp_view_time = 0;
+            lerp_view_rate = 0;
+            old_view_pos = camera.position;
+            old_view_target = camera.target;
+        }
+        // Lerp to local os
+        if (local_os.grabbed && IsKeyPressed(KEY_ESCAPE)) {
+            enter_screen_view = false;
+            leave_screen_view = true;
+            lerp_view_time = 0;
+            lerp_view_rate = 0;
+        }
         updateOS(&local_os);
         if (!local_os.grabbed && MLOCK) {
             if (IsKeyDown(KEY_LEFT_SHIFT)) {
@@ -111,7 +144,35 @@ int main(int argc, char** argv)
             } else {
                 PLAYER_MOVEMENT_SENSITIVITY = 20.f;
             }
-            UpdateCamera(&camera);
+            
+            if (!enter_screen_view && !leave_screen_view)
+                UpdateCamera(&camera);
+        }
+        if (enter_screen_view) {
+            lerp_view_rate = 1.0f/2.f;
+            if (lerp_view_time < 1.f) {
+                lerp_view_time += GetFrameTime() * lerp_view_rate;
+                Vector3 topos = {local_screen.pos.x+screen_offset.x, local_screen.pos.y+screen_offset.y+0.88, local_screen.pos.z+screen_offset.z+0.5};
+                camera.position.x = cerp(old_view_pos.x, topos.x, lerp_view_time);
+                camera.position.y = cerp(old_view_pos.y, topos.y, lerp_view_time);
+                camera.position.z = cerp(old_view_pos.z, topos.z, lerp_view_time);
+                
+                camera.target = (Vector3){topos.x, topos.y, topos.z-1};
+            }
+        }
+        
+        if (leave_screen_view) {
+            lerp_view_rate = 1.0f/2.f;
+            if (lerp_view_time < 1.f) {
+                lerp_view_time += GetFrameTime() * lerp_view_rate;
+                camera.position.x = lerp(local_screen.pos.x+screen_offset.x, old_view_pos.x, lerp_view_time);
+                camera.position.y = lerp(local_screen.pos.y+screen_offset.y+0.88, old_view_pos.y, lerp_view_time);
+                camera.position.z = lerp(local_screen.pos.z+screen_offset.z+0.5, old_view_pos.z, lerp_view_time);
+                
+                camera.target = old_view_target;
+            } else {
+                leave_screen_view = false;
+            }
         }
         
         SetShaderValue(*lighting, viewPos, Vector3ToFloat(camera.position), 3);

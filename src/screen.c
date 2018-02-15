@@ -8,7 +8,6 @@ static Model* screen_player;
 
 static Model screen_viewer;
 static Mesh screen_mesh;
-static Vector3 screen_offset;
 
 void loadScreenModels(Shader lighting)
 {
