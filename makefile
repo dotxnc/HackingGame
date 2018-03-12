@@ -11,19 +11,19 @@ CC =
 ifeq ($(OS),Windows_NT)
 	OUT = $(NAME).exe
 	CC += clang
-	LIBS = -lraylib -lglfw3 -lopengl32 -lgdi32 -lws2_32 -lpthread
+	LIBS = -lraylib -lglfw3 -lopengl32 -lgdi32 -lws2_32 -static -lpthread
 else
 	OUT = $(NAME)
 	CC += gcc
-	LIBS = -lraylib -lglfw3 -lGL -lXxf86vm -lXext -lX11 -lXrandr -lXi -lXinerama -lXcursor -lm -lpthread -ldl  -lpthread
+	LIBS = -lraylib -lglfw3 -lGL -lXxf86vm -lXext -lX11 -lXrandr -lXi -lXinerama -lXcursor -lm -lpthread -ldl -lpthread
 endif
 
 $(OUT): $(OBJ)
-	@ test -d bin || mkdir bin
+#@ test -d bin || mkdir bin #This doesn't work on windows because fuck you
 	$(CC) -o bin/$(OUT) $(CFLAGS) $(OBJ) $(LIBS) $(LDFLAGS)
 
 obj/%.o: src/%.c
-	@ test -d $(@D) || mkdir $(@D)
+#@ test -d $(@D) || mkdir $(@D) #This doesn't work on windows because fuck you
 	$(CC) -c $< -o $@ $(CFLAGS)
 
 clean:
