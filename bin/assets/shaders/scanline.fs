@@ -23,7 +23,7 @@ uniform float time = 0.0;
 void main()
 {
     float frequency = renderHeight/3.0;
-/*
+// /*
     // Scanlines method 1
     float tval = 0; //time
     vec2 uv = 0.5 + (fragTexCoord - 0.5)*(0.9 + 0.01*sin(0.5*tval));
@@ -37,10 +37,10 @@ void main()
     color *= 0.97 + 0.03*sin(110.0*tval);
 
     fragColor = color;
-*/
+// */
     // Scanlines method 2
-    float globalPos = (fragTexCoord.y + time) * frequency;
-    float wavePos = cos((fract(globalPos) - 0.5)*3.14);
+    // float globalPos = (fragTexCoord.y + time) * frequency;
+    // float wavePos = cos((fract(globalPos) - 0.5)*3.14);
     
     // Texel color fetching from texture sampler
     vec4 texelColor = texture(texture0, fragTexCoord);

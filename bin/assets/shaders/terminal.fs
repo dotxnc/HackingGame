@@ -27,8 +27,8 @@ vec2 fisheye(vec2 uv, float str )
     vec2 offset;
     offset.x = ( pow(neg1to1.y,2.0)) * str * (neg1to1.x);
     offset.y = ( pow(neg1to1.x,2.0)) * str * (neg1to1.y);
-    // offset.x = floor(offset.x*500)/500;
-    // offset.y = floor(offset.y*500)/500;
+    offset.x = floor(offset.x*500)/500;
+    offset.y = floor(offset.y*500)/500;
     
     return uv + offset;
 }
@@ -36,14 +36,14 @@ vec2 fisheye(vec2 uv, float str )
 vec3 channelSplit(sampler2D tex, vec2 coord){
     const float spread = 0.008;
     vec3 frag;
-    /* removed because hard to read
+    // removed because hard to read
     frag.r = texture(tex, vec2(coord.x - spread * sin(time), coord.y)).r;
     frag.g = texture(tex, vec2(coord.x, 					  coord.y)).g;
     frag.b = texture(tex, vec2(coord.x + spread * sin(time), coord.y)).b;
-    */
-    frag.r = texture(tex, vec2(coord.x, coord.y)).r;
-    frag.g = texture(tex, vec2(coord.x, coord.y)).g;
-    frag.b = texture(tex, vec2(coord.x, coord.y)).b;
+    
+    // frag.r = texture(tex, vec2(coord.x, coord.y)).r;
+    // frag.g = texture(tex, vec2(coord.x, coord.y)).g;
+    // frag.b = texture(tex, vec2(coord.x, coord.y)).b;
     return frag;
 }
 

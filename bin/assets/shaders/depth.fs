@@ -18,10 +18,11 @@ void main()
 {
     float zNear = 0.01; // camera z near
     float zFar = 10.0;  // camera z far
-    float z = texture2D(texture0, fragTexCoord).x;
+    float z = texture(texture0, fragTexCoord).x;
 
     // Linearize depth value
     float depth = (2.0*zNear)/(zFar + zNear - z*(zFar - zNear));
+    depth = clamp(depth, 0.0, 1.0);
     
     // if (z == 0) {
     //     depth = 1;

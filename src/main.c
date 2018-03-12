@@ -72,7 +72,8 @@ int main(int argc, char** argv)
     loadResourceModel("assets/models/Tower.obj",      "assets/models/Tower.png",      "tower");
     loadResourceModel("assets/models/Gun.obj",        "assets/models/Gun.png",        "viewmodel_gun");
     loadResourceModel("assets/models/Hand.obj",       "assets/models/Hand.png",       "viewmodel_hand");
-    loadResourceTexture("assets/textures/noise.png", "noise");
+    loadResourceTexture("assets/textures/noise.png",  "noise");
+    
     
     // init variables
     camera = (Camera){{ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, 90.0f };
@@ -211,32 +212,17 @@ int main(int argc, char** argv)
             renderViewmodel();
             
             BeginTextureMode(screenspace);
-                Begin3dMode(camera);
-                    drawPlayers();
-                    DrawModel(*getResourceModel("tower"), (Vector3){0, 0, -20}, 1.f, WHITE);
-                    drawScreen(&local_screen);
-                End3dMode();
+                    Begin3dMode(camera);
+                        drawPlayers();
+                        DrawModel(*getResourceModel("tower"), (Vector3){0, 0, -20}, 1.f, WHITE);
+                        drawScreen(&local_screen);
+                    End3dMode();
             EndTextureMode();
             
             BeginShaderMode(*getResourceShader("posterize"));
                 DrawTextureRec(screenspace.texture, (Rectangle){0, 0, 640, -480}, (Vector2){0, 0}, WHITE);
                 drawViewmodel();
             EndShaderMode();
-            
-            if (D) {
-                BeginTextureMode(depthspace);
-                    BeginShaderMode(*getResourceShader("depth"));
-                        Rectangle sourceRec = {0, 0, 640, -480};
-                        Rectangle destRec = { 0, 0, sourceRec.width, abs((sourceRec.height)) };
-                        Vector2 origin = { 0, 0 };
-                        DrawTexturePro(screenspace.depth, sourceRec, destRec, origin, 0.0f, WHITE);
-                    EndShaderMode();
-                EndTextureMode();
-                
-                destRec = (Rectangle){ 0, 0, sourceRec.width*0.5, abs((int)(sourceRec.height*0.5)) };
-                DrawTexturePro(screenspace.texture, sourceRec, destRec, origin, 0.0f, WHITE);
-                drawDebugText();
-            }
             
             if (network.client_running) {
                 if (network.client.ka_timeout < 30) {
